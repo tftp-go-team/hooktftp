@@ -34,6 +34,11 @@ func TestRequestDataWithCustomBlockSize(t *testing.T) {
 		return
 	}
 
+	if rrq.opcode != RRQ {
+		t.Errorf("Bad opcode: %v", rrq.opcode)
+		return
+	}
+
 	if rrq.path != "foo.txt" {
 		t.Errorf("Bad path: %v", rrq.path)
 		return
