@@ -26,12 +26,13 @@ type RRQresponse struct {
 	buffer    []byte
 	pos       int
 	ack       []byte
-	blocksize uint16
+	blocksize int
 	blocknum  uint16
 }
 
 func (res *RRQresponse) Write(p []byte) (int, error) {
 	out := res.buffer[4:]
+	fmt.Println("writing", string(p))
 
 	bytecount := res.pos + len(p)
 
@@ -165,26 +166,18 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 
 }
 
-func sliceUpToNullByte(p []byte) ([]byte, []byte) {
-	for i, b := range p {
-		if b == 0 {
-			return p[0:i], p[i+1 : len(p)]
-		}
-	}
-	return p, nil
-}
 
 func main() {
 	fmt.Println("hello")
 	addr, err := net.ResolveUDPAddr("udp", ":1234")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Failed to resolve address", err)
 		return
 	}
 
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Failed to listen UDP" , err)
 		return
 	}
 
@@ -192,43 +185,27 @@ func main() {
 
 	for {
 		_, client_addr, err := conn.ReadFrom(data)
-		client_udpaddr, err := net.ResolveUDPAddr("udp", client_addr.String())
-
 		if err != nil {
-			fmt.Println(err)
-			return
+			fmt.Println("Failed to read data from client:", err)
+			continue
 		}
 
-		fmt.Println("incoming:", string(data))
-		fmt.Println("incoming bin:", data)
+		raddr, err := net.ResolveUDPAddr("udp", client_addr.String())
+		if err != nil {
+			fmt.Println("Failed to resolve client address:", err)
+			continue
+		}
 
-		opcode := binary.BigEndian.Uint16(data)
+		request, err := ParseRequest(data)
+		if err != nil {
+			fmt.Println("Failed to parse request:", err)
+			continue
+		}
 
-		if opcode == RRQ {
-			rest := data[2:len(data)]
-			requestpath, rest := sliceUpToNullByte(rest)
-
-			mode, rest := sliceUpToNullByte(rest)
-			fmt.Println("mode is", mode)
-
-			option, rest := sliceUpToNullByte(rest)
-
-			blocksize := 512
-
-			if string(option) == "blksize" {
-				blksizebytes, _ := sliceUpToNullByte(rest)
-				blocksize, err = strconv.Atoi(string(blksizebytes))
-				if err != nil {
-					fmt.Println("Failed to parse blksize", blksizebytes)
-					continue
-				}
-
-				fmt.Println("custom block size", blocksize)
-			}
-
-			go SendFile(string(requestpath), blocksize, client_udpaddr)
+		if request.opcode == RRQ {
+			go SendFile(request.path, request.blocksize, raddr)
 		} else {
-			fmt.Println("got something else", data)
+			fmt.Println("Unimplemented opcode:", request.opcode)
 		}
 
 	}
