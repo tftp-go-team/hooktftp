@@ -14,6 +14,10 @@ const (
 	ACK   uint16 = 4
 	ERROR uint16 = 5
 	OACK  uint16 = 6
+
+	DEFAULT_BLOCKSIZE = 512
+	OCTET             = 1
+	NETASCII          = 2
 )
 
 type Connection interface {
@@ -96,7 +100,7 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 }
 
 func (res *RRQresponse) WriteOACK() error {
-	if res.blocksize == 512 {
+	if res.blocksize == DEFAULT_BLOCKSIZE {
 		return nil
 	}
 
@@ -130,9 +134,7 @@ func NewRRQresponse(clientaddr *net.UDPAddr, blocksize int) (*RRQresponse, error
 		return nil, err
 	}
 
-	// fmt.Println("dialing to", clientaddr)
 	conn, err := net.DialUDP("udp", listenaddr, clientaddr)
-	// conn, err := net.ListenUDP("udp", listenaddr)
 
 	if err != nil {
 		fmt.Println("failed to create client conn", err)

@@ -6,12 +6,6 @@ import (
 	"strconv"
 )
 
-const (
-	DEFAULT_BLOCKSIZE = 512
-	OCTET             = 1
-	NETASCII          = 2
-)
-
 type RRQrequest struct {
 	opcode    uint16
 	blocksize int
