@@ -5,10 +5,12 @@ import (
 	"net"
 	"os"
 	"io"
+	"time"
 )
 
 
 func SendFile(path string, blocksize int, addr *net.UDPAddr) {
+	started := time.Now()
 
 	rrq, err := NewRRQresponse(addr, blocksize)
 	if err != nil {
@@ -31,9 +33,11 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 
 	b := make([]byte, rrq.blocksize)
 
+	totalBytes := 0
 
 	for {
 		bytesRead, err := file.Read(b)
+		totalBytes += bytesRead
 
 		if err == io.EOF {
 			rrq.Write(b[:bytesRead])
@@ -49,6 +53,11 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 	}
 
 	file.Close()
+	took := time.Since(started)
+
+	speed := float64(totalBytes) / took.Seconds() / 1024 / 1024
+
+	fmt.Printf("Sent %v bytes in %v %f MB/s\n", totalBytes, took, speed)
 	fmt.Println("END-GET", path)
 	fmt.Println()
 	fmt.Println()
