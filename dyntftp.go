@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net"
+	"os"
+	"io"
 )
 
 
@@ -13,17 +15,49 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 		fmt.Println("Failed to create rrq", err)
 		return
 	}
+	fmt.Println("GET", path, "blocksize", rrq.blocksize)
 
-	rrq.WriteOACK()
-	rrq.Write([]byte("Hello World Foo Bar jea end"))
+	if err := rrq.WriteOACK(); err != nil {
+		return
+	}
 
-	rrq.End()
+
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Println("Failed to open file", path, err)
+		// TODO: write error package
+		return
+	}
+
+	b := make([]byte, rrq.blocksize)
+
+
+	for {
+		bytesRead, err := file.Read(b)
+
+		if err == io.EOF {
+			rrq.Write(b[:bytesRead])
+			rrq.End()
+			break
+		} else if err != nil {
+			fmt.Println("Error while reading", file, err)
+			// TODO: write error package
+			return
+		}
+
+		rrq.Write(b[:bytesRead])
+	}
+
+	file.Close()
+	fmt.Println("END-GET", path)
+	fmt.Println()
+	fmt.Println()
 
 }
 
 
 func main() {
-	fmt.Println("hello")
+	fmt.Println("hello2")
 	addr, err := net.ResolveUDPAddr("udp", ":1234")
 	if err != nil {
 		fmt.Println("Failed to resolve address", err)
@@ -39,7 +73,7 @@ func main() {
 	data := make([]byte, 50)
 
 	for {
-		_, client_addr, err := conn.ReadFrom(data)
+		written, client_addr, err := conn.ReadFrom(data)
 		if err != nil {
 			fmt.Println("Failed to read data from client:", err)
 			continue
@@ -51,7 +85,7 @@ func main() {
 			continue
 		}
 
-		request, err := ParseRequest(data)
+		request, err := ParseRequest(data[:written])
 		if err != nil {
 			fmt.Println("Failed to parse request:", err)
 			continue

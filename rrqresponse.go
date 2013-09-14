@@ -24,7 +24,6 @@ type RRQresponse struct {
 
 func (res *RRQresponse) Write(p []byte) (int, error) {
 	out := res.buffer[4:]
-	fmt.Println("writing", string(p))
 
 	bytecount := res.pos + len(p)
 
@@ -67,14 +66,8 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 		return 0, err
 	}
 
-	fmt.Println()
-	fmt.Println("waiting for ack:", string(out))
-	fmt.Println("raw:", (out))
-	fmt.Println("size:", len(out))
 
 	_, _, err = res.conn.ReadFrom(res.ack)
-	fmt.Println("got ack", res.ack)
-	fmt.Println()
 
 	if err != nil {
 		fmt.Println("failed to read ack", err)
@@ -100,19 +93,26 @@ func (res *RRQresponse) WriteOACK() error {
 	oackbuffer = append(oackbuffer, []byte(strconv.Itoa(res.blocksize))...)
 	oackbuffer = append(oackbuffer, 0)
 
-	fmt.Println("oackbuffer", oackbuffer)
-
 	_, err := res.conn.Write(oackbuffer)
+	if err != nil {
+		fmt.Println("Failed to write OACK:", err)
+		return err
+	}
 
-	fmt.Println("waiting for oack ack")
 	_, _, err = res.conn.ReadFrom(res.ack)
-	fmt.Println("got oack", res.ack)
+	if err != nil {
+		fmt.Println("Failed to read ACK for OACK:", err)
+		return err
+	}
+
 	// TODO: assert ack
 
-	return err
+	return nil
 }
 
 func (res *RRQresponse) End() (int, error) {
+	// Signal end of the transmission. This can be neither empty block or
+	// block smaller than res.blocksize
 	return res.writeBuffer()
 }
 
@@ -130,7 +130,6 @@ func NewRRQresponse(clientaddr *net.UDPAddr, blocksize int) (*RRQresponse, error
 		return nil, err
 	}
 
-	fmt.Println("listenting client on:", conn.LocalAddr(), conn.RemoteAddr())
 	return &RRQresponse{
 		conn,
 		make([]byte, blocksize+4),

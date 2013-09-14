@@ -71,9 +71,10 @@ func ParseRequest(data []byte) (*RRQrequest, error) {
 				return request, err
 			}
 			request.blocksize = blocksize
-			fmt.Println("custom block size", blocksize)
 		default:
-			fmt.Println("Unknown option:", (option))
+			fmt.Println("Unknown option:", option, string(option))
+			fmt.Println("data:", data)
+			fmt.Println("data string:", string(data))
 			// throw away unknown option value
 			_, rest = sliceUpToNullByte(rest)
 		}
