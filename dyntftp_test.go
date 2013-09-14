@@ -30,7 +30,7 @@ func newRRQResonponse() (*RRQresponse, *MockConnection) {
 		make([]byte, blocksize+4),
 		0,
 		make([]byte, 5),
-		uint16(blocksize),
+		blocksize,
 		0,
 	}
 	return rrq, conn
@@ -129,4 +129,16 @@ func Test2LargePackets(t *testing.T) {
 	if blocknum != 1 {
 		t.Fatalf("Bad blocknum %v", conn.datawritten)
 	}
+}
+
+func TestOACK(t *testing.T) {
+	rrq, conn := newRRQResonponse()
+	rrq.WriteOACK()
+
+	if !reflect.DeepEqual(conn.datawritten[0], []byte{0, 6, 98, 108, 107, 115, 105, 122, 101, 0, 53, 0}) {
+		t.Fatalf("Bad oack written %v", conn.datawritten[0])
+	}
+
+
+
 }

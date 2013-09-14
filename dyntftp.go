@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 	"net"
+	"strconv"
 )
 
 const (
@@ -46,16 +46,15 @@ func (res *RRQresponse) Write(p []byte) (int, error) {
 	res.pos += copied
 
 	if res.pos == int(res.blocksize) {
+
 		_, err := res.writeBuffer()
 		if err != nil {
 			return 0, err
 		}
 
+		res.pos = 0
 		if len(remaining) != 0 {
-			res.pos = 0
 			return res.Write(remaining)
-		} else {
-			res.pos = 0
 		}
 	}
 
@@ -68,13 +67,24 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 	binary.BigEndian.PutUint16(res.buffer[2:], res.blocknum)
 
 	out := res.buffer[:res.pos+4]
-	written, err := res.conn.Write(out)
 
+	written, err := res.conn.Write(out)
 	if err != nil {
+		fmt.Println("failed to write to connection", err)
 		return 0, err
 	}
+
+	fmt.Println()
+	fmt.Println("waiting for ack:", string(out))
+	fmt.Println("raw:", (out))
+	fmt.Println("size:", len(out))
+
 	_, _, err = res.conn.ReadFrom(res.ack)
+	fmt.Println("got ack", res.ack)
+	fmt.Println()
+
 	if err != nil {
+		fmt.Println("failed to read ack", err)
 		return 0, err
 	}
 
@@ -84,46 +94,88 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 
 }
 
+func (res *RRQresponse) WriteOACK() error {
+	if res.blocksize == 512 {
+		return nil
+	}
+
+	oackbuffer := make([]byte, 2)
+	binary.BigEndian.PutUint16(oackbuffer, OACK)
+
+	oackbuffer = append(oackbuffer, []byte("blksize")...)
+	oackbuffer = append(oackbuffer, 0)
+	oackbuffer = append(oackbuffer, []byte(strconv.Itoa(res.blocksize))...)
+	oackbuffer = append(oackbuffer, 0)
+
+	fmt.Println("oackbuffer", oackbuffer)
+
+	_, err := res.conn.Write(oackbuffer)
+
+	fmt.Println("waiting for oack ack")
+	_, _, err = res.conn.ReadFrom(res.ack)
+	fmt.Println("got oack", res.ack)
+
+	return err
+}
+
 func (res *RRQresponse) End() (int, error) {
 	return res.writeBuffer()
 }
 
-func NewRRQresponse(addr *net.UDPAddr, blocksize uint16) (*RRQresponse, error) {
-	conn, err := net.DialUDP("udp", nil, addr)
+func NewRRQresponse(clientaddr *net.UDPAddr, blocksize int) (*RRQresponse, error) {
+
+	listenaddr, err := net.ResolveUDPAddr("udp", ":0")
 	if err != nil {
 		return nil, err
 	}
 
+	// fmt.Println("dialing to", clientaddr)
+	conn, err := net.DialUDP("udp", listenaddr, clientaddr)
+	// conn, err := net.ListenUDP("udp", listenaddr)
+
+	if err != nil {
+		fmt.Println("failed to create client conn", err)
+		return nil, err
+	}
+
+	fmt.Println("listenting client on:", conn.LocalAddr(), conn.RemoteAddr())
 	return &RRQresponse{
 		conn,
 		make([]byte, blocksize+4),
 		0,
-		make([]byte, 5),
+		make([]byte, 4),
 		blocksize,
 		0,
 	}, nil
 
 }
 
-func SendFile(path string, addr *net.UDPAddr) {
+func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 
-	rrq, err := NewRRQresponse(addr, 10)
+	rrq, err := NewRRQresponse(addr, blocksize)
 	if err != nil {
 		fmt.Println("Failed to create rrq", err)
 		return
 	}
 
-	rrq.Write([]byte("Hello "))
-	rrq.Write([]byte("Hello "))
-	rrq.Write([]byte("Hello "))
-	rrq.Write([]byte("Hello "))
-	rrq.Write([]byte("Hello "))
+	rrq.WriteOACK()
+	rrq.Write([]byte("Hello World Foo Bar jea end"))
 
 	rrq.End()
 
 }
 
+func sliceUpToNullByte(p []byte) ([]byte, []byte) {
+	for i, b := range p {
+		if b == 0 {
+			return p[0:i], p[i+1 : len(p)]
+		}
+	}
+	return p, nil
+}
+
 func main() {
+	fmt.Println("hello")
 	addr, err := net.ResolveUDPAddr("udp", ":1234")
 	if err != nil {
 		fmt.Println(err)
@@ -136,7 +188,7 @@ func main() {
 		return
 	}
 
-	data := make([]byte, 20)
+	data := make([]byte, 50)
 
 	for {
 		_, client_addr, err := conn.ReadFrom(data)
@@ -147,11 +199,34 @@ func main() {
 			return
 		}
 
-		buf := bytes.NewBuffer(data)
-		var optcode uint16
-		binary.Read(buf, binary.BigEndian, &optcode)
-		if optcode == RRQ {
-			go SendFile("foo", client_udpaddr)
+		fmt.Println("incoming:", string(data))
+		fmt.Println("incoming bin:", data)
+
+		opcode := binary.BigEndian.Uint16(data)
+
+		if opcode == RRQ {
+			rest := data[2:len(data)]
+			requestpath, rest := sliceUpToNullByte(rest)
+
+			mode, rest := sliceUpToNullByte(rest)
+			fmt.Println("mode is", mode)
+
+			option, rest := sliceUpToNullByte(rest)
+
+			blocksize := 512
+
+			if string(option) == "blksize" {
+				blksizebytes, _ := sliceUpToNullByte(rest)
+				blocksize, err = strconv.Atoi(string(blksizebytes))
+				if err != nil {
+					fmt.Println("Failed to parse blksize", blksizebytes)
+					continue
+				}
+
+				fmt.Println("custom block size", blocksize)
+			}
+
+			go SendFile(string(requestpath), blocksize, client_udpaddr)
 		} else {
 			fmt.Println("got something else", data)
 		}
