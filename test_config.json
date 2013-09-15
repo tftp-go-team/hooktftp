@@ -1,0 +1,7 @@
+{
+   "port": "12343",
+   "hooks": [
+	   [".*custom.*", "echo jea"]
+	]
+}
+

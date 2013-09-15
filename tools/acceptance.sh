@@ -28,6 +28,7 @@ atftp --option "blksize 1536" --get --remote-file fixtures/big2 --local-file $OU
 
 cd $OUTDIR
 sha1sum --check ../fixtures/SHA1SUMS
+cd ..
 
 set +e
 ERROR_MESSAGE=$(atftp --get --remote-file nonexistent --local-file /dev/null localhost 1234 2>&1)
@@ -45,6 +46,12 @@ if [[ ! $ERROR_MESSAGE =~ "Path access violation" ]]; then
     exit 1
 fi
 
+atftp --get --remote-file custom.txt --local-file $OUTDIR/custom.txt localhost 1234
+CONTENT=$(cat $OUTDIR/custom.txt)
+if [ "$CONTENT" != "customdata" ]; then
+    echo "Did not receive custom data for custom.txt"
+    exit 1
+fi
 
 
 echo "ALL OK"

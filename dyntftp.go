@@ -48,6 +48,15 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 		return
 	}
 
+	for _, hook := range config.Hooks {
+		if hook.Regexp.MatchString(path) {
+			// TODO: execute command
+			rrq.Write([]byte("customdata"))
+			rrq.End()
+			return
+		}
+	}
+
 
 	file, err := os.Open(path)
 	if err != nil {
