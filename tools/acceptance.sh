@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 OUTDIR="out$1"
 
@@ -28,3 +28,13 @@ atftp --option "blksize 1536" --get --remote-file fixtures/big2 --local-file $OU
 
 cd $OUTDIR
 sha1sum --check ../fixtures/SHA1SUMS
+
+set +e
+ERROR_MESSAGE=$(atftp --get --remote-file nonexistent --local-file /dev/null localhost 1234 2>&1)
+set -e
+if [[ ! $ERROR_MESSAGE =~ "no such file or directory" ]]; then
+    echo "Cannot find 'no such file or directory' from: $ERROR_MESSAGE"
+    exit 1
+fi
+
+echo "ALL OK"
