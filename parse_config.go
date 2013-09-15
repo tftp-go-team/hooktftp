@@ -2,16 +2,39 @@
 package main
 
 import (
-	"os"
-	"io"
+	"fmt"
 	"encoding/json"
+	"io"
+	"os"
+	"os/exec"
 	"regexp"
+	"strings"
 )
 
 type Hook struct {
 	Regexp *regexp.Regexp
 	Command string
 }
+
+func (h *Hook) Execute() (io.Reader, error) {
+	if strings.HasPrefix(h.Command, "sh:") {
+		return h.ShExecute()
+	}
+	// TODO: implement http fetch
+
+	return nil, fmt.Errorf("Unknown command type %v", h.Command)
+}
+
+func (h *Hook) ShExecute() (io.Reader, error) {
+	cmd := exec.Command("sh", "-c", h.Command[3:])
+	reader, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+	err = cmd.Start()
+	return reader, err
+}
+
 
 type Config struct {
 	Port string
