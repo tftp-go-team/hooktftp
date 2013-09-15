@@ -2,42 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"os"
+	"io"
 	"time"
 )
 
-type DataResponse struct {
-	data []byte
-	bytesRead int
-	err error
-}
-
-func ReadToChannel(path string, dataChan, returnChan chan *DataResponse) {
-	datares := <- returnChan
-	file, err := os.Open(path)
-	if err != nil {
-		datares.err = err
-		dataChan <- datares
-		return
-	}
-
-	for {
-		bytesRead, err := file.Read(datares.data)
-		datares.bytesRead = bytesRead
-		datares.err = err
-		dataChan <- datares
-		if err != nil {
-			if err := file.Close(); err != nil {
-				fmt.Println("Failed to close", path, err)
-			}
-			break
-		}
-		datares = <- returnChan
-	}
-
-}
 
 func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 	started := time.Now()
@@ -53,38 +23,36 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 		return
 	}
 
-	bufsize := 10
-	dataChan := make(chan *DataResponse, bufsize)
-	returnChan := make(chan *DataResponse, bufsize)
 
-	datapool := make([]byte, blocksize*bufsize)
-	for i := 0; i < bufsize; i++ {
-		start := blocksize * i
-		end := start + blocksize
-		returnChan <- &DataResponse{data: datapool[start:end]}
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Println("Failed to open file", path, err)
+		// TODO: write error package
+		return
 	}
 
-	go ReadToChannel(path, dataChan, returnChan)
+	b := make([]byte, rrq.blocksize)
 
 	totalBytes := 0
 
 	for {
-		datares := <- dataChan
-		totalBytes += datares.bytesRead
-		if datares.err == io.EOF {
-			rrq.Write(datares.data[:datares.bytesRead])
+		bytesRead, err := file.Read(b)
+		totalBytes += bytesRead
+
+		if err == io.EOF {
+			rrq.Write(b[:bytesRead])
 			rrq.End()
 			break
-		} else if datares.err != nil {
-			fmt.Println("Failed to read data from file:", datares.err)
-			break
-		} else {
-			rrq.Write(datares.data[:datares.bytesRead])
+		} else if err != nil {
+			fmt.Println("Error while reading", file, err)
+			// TODO: write error package
+			return
 		}
 
-		returnChan <- datares
+		rrq.Write(b[:bytesRead])
 	}
 
+	file.Close()
 	took := time.Since(started)
 
 	speed := float64(totalBytes) / took.Seconds() / 1024 / 1024
@@ -96,6 +64,7 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 
 }
 
+
 func main() {
 	fmt.Println("hello2")
 	addr, err := net.ResolveUDPAddr("udp", ":1234")
@@ -106,7 +75,7 @@ func main() {
 
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
-		fmt.Println("Failed to listen UDP", err)
+		fmt.Println("Failed to listen UDP" , err)
 		return
 	}
 
