@@ -13,6 +13,8 @@ import (
 
 var root = flag.String("root", "/var/lib/tftpboot/", "Serve files from")
 var port = flag.String("port", "69", "Port to listen")
+var configPath = flag.String("config", "/etc/dyntftp.json", "Config file")
+var config *Config
 
 func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 	path = filepath.Join(*root, path)
@@ -95,6 +97,12 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 func main() {
 	flag.Parse()
 	*root, _ = filepath.Abs(*root)
+	var err error
+	config, err = ParseConfig(*configPath)
+	if err != nil {
+		fmt.Println("Failed to parse", *configPath, err)
+		return
+	}
 
 	fmt.Println("flags", *root, *port)
 	addr, err := net.ResolveUDPAddr("udp", ":" + *port)
