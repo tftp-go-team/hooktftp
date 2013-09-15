@@ -3,7 +3,6 @@ package main
 
 import (
 	"net"
-	"fmt"
 	"encoding/binary"
 	"strconv"
 )
@@ -62,7 +61,6 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 
 	written, err := res.conn.Write(out)
 	if err != nil {
-		fmt.Println("failed to write to connection", err)
 		return 0, err
 	}
 
@@ -70,7 +68,6 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 	_, _, err = res.conn.ReadFrom(res.ack)
 
 	if err != nil {
-		fmt.Println("failed to read ack", err)
 		return 0, err
 	}
 
@@ -92,12 +89,7 @@ func (res *RRQresponse) WriteError(code uint16, message string) error {
 	errorbuffer[len(errorbuffer)-1] = 0
 
 	_, err := res.conn.Write(errorbuffer)
-	if err != nil {
-		fmt.Println("Failed to write ERROR:", err)
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (res *RRQresponse) WriteOACK() error {
@@ -115,13 +107,11 @@ func (res *RRQresponse) WriteOACK() error {
 
 	_, err := res.conn.Write(oackbuffer)
 	if err != nil {
-		fmt.Println("Failed to write OACK:", err)
 		return err
 	}
 
 	_, _, err = res.conn.ReadFrom(res.ack)
 	if err != nil {
-		fmt.Println("Failed to read ACK for OACK:", err)
 		return err
 	}
 
@@ -146,7 +136,6 @@ func NewRRQresponse(clientaddr *net.UDPAddr, blocksize int) (*RRQresponse, error
 	conn, err := net.DialUDP("udp", listenaddr, clientaddr)
 
 	if err != nil {
-		fmt.Println("failed to create client conn", err)
 		return nil, err
 	}
 

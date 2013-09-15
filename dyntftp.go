@@ -20,6 +20,7 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 	fmt.Println("GET", path, "blocksize", rrq.blocksize)
 
 	if err := rrq.WriteOACK(); err != nil {
+		fmt.Println("Failed to write OACK", err)
 		return
 	}
 
@@ -31,6 +32,8 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 		return
 	}
 
+	defer file.Close()
+
 	b := make([]byte, rrq.blocksize)
 
 	totalBytes := 0
@@ -40,7 +43,10 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 		totalBytes += bytesRead
 
 		if err == io.EOF {
-			rrq.Write(b[:bytesRead])
+			if _, err := rrq.Write(b[:bytesRead]); err != nil {
+				fmt.Println("Failed to write last bytes of the file", err)
+				return
+			}
 			rrq.End()
 			break
 		} else if err != nil {
@@ -49,24 +55,21 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 			return
 		}
 
-		rrq.Write(b[:bytesRead])
+		if _, err := rrq.Write(b[:bytesRead]); err != nil {
+			fmt.Println("Failed to write bytes for", path, err)
+			return
+		}
 	}
 
-	file.Close()
 	took := time.Since(started)
 
 	speed := float64(totalBytes) / took.Seconds() / 1024 / 1024
 
 	fmt.Printf("Sent %v bytes in %v %f MB/s\n", totalBytes, took, speed)
-	fmt.Println("END-GET", path)
-	fmt.Println()
-	fmt.Println()
-
 }
 
 
 func main() {
-	fmt.Println("hello2")
 	addr, err := net.ResolveUDPAddr("udp", ":1234")
 	if err != nil {
 		fmt.Println("Failed to resolve address", err)
