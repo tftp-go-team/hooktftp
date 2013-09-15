@@ -80,6 +80,26 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 
 }
 
+func (res *RRQresponse) WriteError(code uint16, message string) error {
+
+	// http://tools.ietf.org/html/rfc1350#page-8
+	errorbuffer := make([]byte, 2+2+len(message)+1)
+
+	binary.BigEndian.PutUint16(errorbuffer, ERROR)
+	binary.BigEndian.PutUint16(errorbuffer[2:], code)
+
+	copy(errorbuffer[4:], message)
+	errorbuffer[len(errorbuffer)-1] = 0
+
+	_, err := res.conn.Write(errorbuffer)
+	if err != nil {
+		fmt.Println("Failed to write ERROR:", err)
+		return err
+	}
+
+	return nil
+}
+
 func (res *RRQresponse) WriteOACK() error {
 	if res.blocksize == DEFAULT_BLOCKSIZE {
 		return nil

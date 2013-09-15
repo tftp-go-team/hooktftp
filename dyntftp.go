@@ -27,7 +27,7 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 	file, err := os.Open(path)
 	if err != nil {
 		fmt.Println("Failed to open file", path, err)
-		// TODO: write error package
+		rrq.WriteError(NOT_FOUND, err.Error())
 		return
 	}
 
@@ -45,7 +45,7 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 			break
 		} else if err != nil {
 			fmt.Println("Error while reading", file, err)
-			// TODO: write error package
+			rrq.WriteError(UNKNOWN_ERROR, err.Error())
 			return
 		}
 

@@ -139,6 +139,16 @@ func TestOACK(t *testing.T) {
 		t.Fatalf("Bad oack written %v", conn.datawritten[0])
 	}
 
+}
 
+
+func TestErrorPacket(t *testing.T) {
+	rrq, conn := newRRQResonponse()
+	// http://tools.ietf.org/html/rfc1350#page-8
+	rrq.WriteError(NOT_FOUND, "aa")
+
+	if !reflect.DeepEqual(conn.datawritten[0], []byte{0, 5, 0, 1, 97, 97, 0}) {
+		t.Fatalf("Bad error written %v", conn.datawritten[0])
+	}
 
 }
