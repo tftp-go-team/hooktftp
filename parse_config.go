@@ -3,6 +3,7 @@ package main
 
 import (
 	"os"
+	"io"
 	"encoding/json"
 	"regexp"
 )
@@ -17,8 +18,17 @@ type Config struct {
 	Hooks []*Hook
 }
 
+func ParseConfigFile(path string) (*Config, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return ParseConfig(file)
+}
 
-func ParseConfig(path string) (*Config, error) {
+
+func ParseConfig(reader io.Reader) (*Config, error) {
 	config := &Config{}
 
 	var tmp struct {
@@ -26,13 +36,7 @@ func ParseConfig(path string) (*Config, error) {
 		Hooks [][]string
 	}
 
-	file, err := os.Open(path)
-	if err != nil {
-		return config, err
-	}
-	defer file.Close()
-
-	jsonDecoder := json.NewDecoder(file)
+	jsonDecoder := json.NewDecoder(reader)
 	if err := jsonDecoder.Decode(&tmp); err != nil {
 		return config, err
 	}

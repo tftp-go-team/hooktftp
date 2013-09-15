@@ -107,7 +107,7 @@ func main() {
 	flag.Parse()
 	*root, _ = filepath.Abs(*root)
 	var err error
-	config, err = ParseConfig(*configPath)
+	config, err = ParseConfigFile(*configPath)
 	if err != nil {
 		fmt.Println("Failed to parse", *configPath, err)
 		return
