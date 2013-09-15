@@ -6,10 +6,15 @@ import (
 	"os"
 	"io"
 	"time"
+	"flag"
+	"path/filepath"
+	"strings"
 )
 
 
 func SendFile(path string, blocksize int, addr *net.UDPAddr) {
+	path = filepath.Join(*root, path)
+
 	started := time.Now()
 
 	rrq, err := NewRRQresponse(addr, blocksize)
@@ -17,7 +22,22 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 		fmt.Println("Failed to create rrq", err)
 		return
 	}
+
+	path, err = filepath.Abs(path)
+
+	if err != nil {
+		fmt.Println("Bad path", err)
+		rrq.WriteError(UNKNOWN_ERROR, "Invalid file path:" + err.Error())
+		return
+	}
 	fmt.Println("GET", path, "blocksize", rrq.blocksize)
+
+	if !strings.HasPrefix(path, *root) {
+		fmt.Println("Path access violation", path)
+		rrq.WriteError(ACCESS_VIOLATION, "Path access violation")
+		return
+	}
+
 
 	if err := rrq.WriteOACK(); err != nil {
 		fmt.Println("Failed to write OACK", err)
@@ -69,7 +89,14 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 }
 
 
+var root = flag.String("root", "/var/lib/tftpboot/", "Serve files from")
+var port = flag.Int("port", 69, "Port to listen")
+
 func main() {
+	flag.Parse()
+	*root, _ = filepath.Abs(*root)
+
+	fmt.Println("flags", *root, *port)
 	addr, err := net.ResolveUDPAddr("udp", ":1234")
 	if err != nil {
 		fmt.Println("Failed to resolve address", err)

@@ -37,4 +37,14 @@ if [[ ! $ERROR_MESSAGE =~ "no such file or directory" ]]; then
     exit 1
 fi
 
+set +e
+ERROR_MESSAGE=$(atftp --get --remote-file ../foo.txt --local-file /dev/null localhost 1234 2>&1)
+set -e
+if [[ ! $ERROR_MESSAGE =~ "Path access violation" ]]; then
+    echo "Cannot find 'Path access violation' from: $ERROR_MESSAGE"
+    exit 1
+fi
+
+
+
 echo "ALL OK"
