@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+var root = flag.String("root", "/var/lib/tftpboot/", "Serve files from")
+var port = flag.String("port", "69", "Port to listen")
 
 func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 	path = filepath.Join(*root, path)
@@ -89,15 +91,13 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 }
 
 
-var root = flag.String("root", "/var/lib/tftpboot/", "Serve files from")
-var port = flag.Int("port", 69, "Port to listen")
 
 func main() {
 	flag.Parse()
 	*root, _ = filepath.Abs(*root)
 
 	fmt.Println("flags", *root, *port)
-	addr, err := net.ResolveUDPAddr("udp", ":1234")
+	addr, err := net.ResolveUDPAddr("udp", ":" + *port)
 	if err != nil {
 		fmt.Println("Failed to resolve address", err)
 		return
