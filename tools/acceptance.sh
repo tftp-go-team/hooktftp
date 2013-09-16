@@ -18,13 +18,15 @@ rm -rf $OUTDIR
 mkdir $OUTDIR
 
 echo "Fetching files"
-fetch small
-fetch medium
-fetch mod512
-fetch mod512double
-fetch big
-atftp --option "blksize 100" --get --remote-file fixtures/medium2 --local-file $OUTDIR/medium2 localhost 1234
-atftp --option "blksize 1536" --get --remote-file fixtures/big2 --local-file $OUTDIR/big2 localhost 1234
+fetch small &
+fetch medium &
+fetch mod512 &
+fetch mod512double &
+fetch big &
+atftp --option "blksize 100" --get --remote-file fixtures/medium2 --local-file $OUTDIR/medium2 localhost 1234 &
+atftp --option "blksize 1536" --get --remote-file fixtures/big2 --local-file $OUTDIR/big2 localhost 1234 &
+
+wait
 
 cd $OUTDIR
 sha1sum --check ../fixtures/SHA1SUMS
