@@ -1,10 +1,12 @@
-
 package main
 
 import (
-	"net"
 	"encoding/binary"
+	"fmt"
+	"math/rand"
+	"net"
 	"strconv"
+	"time"
 )
 
 type Connection interface {
@@ -13,12 +15,21 @@ type Connection interface {
 }
 
 type RRQresponse struct {
-	conn      Connection
-	buffer    []byte
-	pos       int
-	ack       []byte
-	blocksize int
-	blocknum  uint16
+	conn        Connection
+	buffer      []byte
+	pos         int
+	ack         []byte
+	blocksize   int
+	blocknum    uint16
+	badinternet bool
+}
+
+func (res *RRQresponse) SimulateBadInternet() bool {
+	if !res.badinternet {
+		return false
+	}
+	rand.Seed(time.Now().UTC().UnixNano())
+	return rand.Int()%12345 == 0
 }
 
 func (res *RRQresponse) Write(p []byte) (int, error) {
@@ -59,22 +70,43 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 
 	out := res.buffer[:res.pos+4]
 
-	written, err := res.conn.Write(out)
+	var written int
+	if res.SimulateBadInternet() {
+		// Just skip sending the packet
+	} else {
+		var err error
+		written, err = res.conn.Write(out)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	_, _, err := res.conn.ReadFrom(res.ack)
 	if err != nil {
 		return 0, err
 	}
 
-
-	_, _, err = res.conn.ReadFrom(res.ack)
-
-	if err != nil {
-		return 0, err
+	opcode := binary.BigEndian.Uint16(res.ack)
+	if opcode != ACK {
+		return 0, fmt.Errorf("Expected ACK code, got %v", opcode)
 	}
 
-	// TODO: assert ack
+	acknum := binary.BigEndian.Uint16(res.ack[2:])
+	if acknum == res.blocknum-1 {
+		fmt.Println("Got previous ACK", acknum, "Retrying...")
+		res.blocknum--
+		return res.writeBuffer()
+	}
+
+	if acknum != res.blocknum {
+		return 0, fmt.Errorf(
+			"Got weird ACK num %v, expected %v",
+			opcode,
+			res.blocknum,
+		)
+	}
 
 	return written, nil
-
 }
 
 func (res *RRQresponse) WriteError(code uint16, message string) error {
@@ -126,7 +158,7 @@ func (res *RRQresponse) End() (int, error) {
 	return res.writeBuffer()
 }
 
-func NewRRQresponse(clientaddr *net.UDPAddr, blocksize int) (*RRQresponse, error) {
+func NewRRQresponse(clientaddr *net.UDPAddr, blocksize int, badinternet bool) (*RRQresponse, error) {
 
 	listenaddr, err := net.ResolveUDPAddr("udp", ":0")
 	if err != nil {
@@ -146,7 +178,7 @@ func NewRRQresponse(clientaddr *net.UDPAddr, blocksize int) (*RRQresponse, error
 		make([]byte, 4),
 		blocksize,
 		0,
+		badinternet,
 	}, nil
 
 }
-

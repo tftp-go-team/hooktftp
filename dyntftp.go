@@ -13,15 +13,17 @@ import (
 
 var root = flag.String("root", "/var/lib/tftpboot/", "Serve files from")
 var port = flag.String("port", "69", "Port to listen")
+var badinternet = flag.Bool("simulate-bad-internet", false, "Simulate bad internet connection for testing purposes")
 var configPath = flag.String("config", "/etc/dyntftp.json", "Config file")
 var config *Config
+
 
 func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 	path = filepath.Join(*root, path)
 
 	started := time.Now()
 
-	rrq, err := NewRRQresponse(addr, blocksize)
+	rrq, err := NewRRQresponse(addr, blocksize, *badinternet)
 	if err != nil {
 		fmt.Println("Failed to create rrq", err)
 		return
