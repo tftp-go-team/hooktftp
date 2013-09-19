@@ -9,6 +9,19 @@ fetch() {
     atftp --get --remote-file fixtures/$1 --local-file $OUTDIR/$1 localhost 1234 || true
 }
 
+contains() {
+    echo
+    echo
+    if [[ "$1" == *"$2"* ]]; then
+        echo "OK '$2'"
+        echo
+    else
+        echo "FAIL: Did not find '$2' from '$1'"
+        exit 1
+    fi
+
+}
+
 if [ ! -d fixtures ]; then
     echo "Fixtures missing! Run tools/create-fixtures.sh"
     exit 1
@@ -33,26 +46,22 @@ sha1sum --check ../fixtures/SHA1SUMS
 cd ..
 
 set +e
-ERROR_MESSAGE=$(atftp --get --remote-file nonexistent --local-file /dev/null localhost 1234 2>&1)
+ERROR_MESSAGE=$(atftp --get --remote-file small --local-file /dev/null localhost 1234 2>&1)
 set -e
-if [[ ! $ERROR_MESSAGE =~ "no such file or directory" ]]; then
-    echo "Cannot find 'no such file or directory' from: $ERROR_MESSAGE"
-    exit 1
-fi
+contains "$ERROR_MESSAGE" "no such file or directory"
 
 set +e
 ERROR_MESSAGE=$(atftp --get --remote-file ../foo.txt --local-file /dev/null localhost 1234 2>&1)
 set -e
-if [[ ! $ERROR_MESSAGE =~ "Path access violation" ]]; then
-    echo "Cannot find 'Path access violation' from: $ERROR_MESSAGE"
-    exit 1
-fi
+contains "$ERROR_MESSAGE" "Path access violation"
 
 atftp --get --remote-file custom.txt --local-file $OUTDIR/custom.txt localhost 1234
 CONTENT=$(cat $OUTDIR/custom.txt)
 if [ "$CONTENT" != "customdata" ]; then
-    echo "Did not receive custom data for custom.txt"
+    echo "FAIL Did not receive custom data for custom.txt"
     exit 1
+else
+    echo "OK custom data"
 fi
 
 
