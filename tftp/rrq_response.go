@@ -73,6 +73,7 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 	var written int
 	if res.SimulateBadInternet() {
 		// Just skip sending the packet
+		written = len(out)
 	} else {
 		var err error
 		written, err = res.conn.Write(out)

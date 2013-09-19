@@ -19,6 +19,9 @@ func (conn *MockConnection) Write(incoming []byte) (int, error) {
 }
 
 func (conn *MockConnection) ReadFrom(p []byte) (n int, addr net.Addr, err error) {
+	num := binary.BigEndian.Uint16(conn.datawritten[len(conn.datawritten)-1][2:])
+	binary.BigEndian.PutUint16(p, ACK)
+	binary.BigEndian.PutUint16(p[2:], num)
 	return len(p), nil, nil
 }
 
@@ -114,9 +117,16 @@ func TestLargePacket(t *testing.T) {
 
 func Test2LargePackets(t *testing.T) {
 	rrq, conn := newRRQResonponse()
-	rrq.Write([]byte{1, 2, 3, 4, 5, 6})
-	rrq.Write([]byte{7, 8, 9, 0, 0, 9})
 
+	_, err := rrq.Write([]byte{1, 2, 3, 4, 5, 6})
+	if err != nil {
+		t.Fatalf("Got error after write: %v", err)
+	}
+
+	_, err = rrq.Write([]byte{7, 8, 9, 0, 0, 9})
+	if err != nil {
+		t.Fatalf("Got error after write: %v", err)
+	}
 
 	if len(conn.datawritten) != 2 {
 		t.Fatalf("Bad value written %v", conn.datawritten)
