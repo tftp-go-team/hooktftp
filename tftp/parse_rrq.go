@@ -1,4 +1,4 @@
-package main
+package tftp
 
 import (
 	"encoding/binary"
@@ -6,11 +6,11 @@ import (
 	"strconv"
 )
 
-type RRQrequest struct {
-	opcode    uint16
-	blocksize int
-	mode      int
-	path      string
+type Request struct {
+	Opcode    uint16
+	Blocksize int
+	Mode      int
+	Path      string
 }
 
 type RRQParseError struct {
@@ -30,25 +30,25 @@ func sliceUpToNullByte(p []byte) ([]byte, []byte) {
 	return p, nil
 }
 
-func ParseRequest(data []byte) (*RRQrequest, error) {
-	request := &RRQrequest{blocksize: DEFAULT_BLOCKSIZE}
-	request.opcode = binary.BigEndian.Uint16(data)
+func ParseRequest(data []byte) (*Request, error) {
+	request := &Request{Blocksize: DEFAULT_BLOCKSIZE}
+	request.Opcode = binary.BigEndian.Uint16(data)
 
-	if request.opcode != RRQ {
-		return request, fmt.Errorf("Unknown optcode %d", request.opcode)
+	if request.Opcode != RRQ {
+		return request, fmt.Errorf("Unknown optcode %d", request.Opcode)
 	}
 
 	rest := data[2:len(data)]
 	filepath, rest := sliceUpToNullByte(rest)
-	request.path = string(filepath)
+	request.Path = string(filepath)
 
 	mode, rest := sliceUpToNullByte(rest)
 
 	switch string(mode) {
 	case "octet":
-		request.mode = OCTET
+		request.Mode = OCTET
 	case "netascii":
-		request.mode = NETASCII
+		request.Mode = NETASCII
 	default:
 		return request, fmt.Errorf("Unknown mode %v (%v)", mode, string(mode))
 	}
@@ -70,7 +70,7 @@ func ParseRequest(data []byte) (*RRQrequest, error) {
 				fmt.Println("Failed to parse blksize", blksizebytes)
 				return request, err
 			}
-			request.blocksize = blocksize
+			request.Blocksize = blocksize
 		default:
 			fmt.Println("Unknown option:", option, string(option))
 			fmt.Println("data:", data)

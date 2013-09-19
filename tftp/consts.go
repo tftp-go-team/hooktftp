@@ -1,4 +1,4 @@
-package main
+package tftp
 
 const (
 	RRQ   uint16 = 1

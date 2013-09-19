@@ -1,5 +1,5 @@
 
-package main
+package tftp
 
 import (
 	"fmt"
@@ -34,23 +34,23 @@ func TestRequestDataWithCustomBlockSize(t *testing.T) {
 		return
 	}
 
-	if rrq.opcode != RRQ {
-		t.Errorf("Bad opcode: %v", rrq.opcode)
+	if rrq.Opcode != RRQ {
+		t.Errorf("Bad opcode: %v", rrq.Opcode)
 		return
 	}
 
-	if rrq.path != "foo.txt" {
-		t.Errorf("Bad path: %v", rrq.path)
+	if rrq.Path != "foo.txt" {
+		t.Errorf("Bad path: %v", rrq.Path)
 		return
 	}
 
-	if rrq.mode != OCTET {
-		t.Errorf("Bad mode: %v", rrq.mode)
+	if rrq.Mode != OCTET {
+		t.Errorf("Bad mode: %v", rrq.Mode)
 		return
 	}
 
-	if rrq.blocksize != 5 {
-		t.Errorf("Bad blocksize: %v", rrq.blocksize)
+	if rrq.Blocksize != 5 {
+		t.Errorf("Bad blocksize: %v", rrq.Blocksize)
 		return
 	}
 
@@ -67,8 +67,8 @@ func TestRequestDataWithDefaultBlockSize(t *testing.T) {
 		return
 	}
 
-	if rrq.blocksize != DEFAULT_BLOCKSIZE {
-		t.Errorf("Bad blocksize: %v", rrq.blocksize)
+	if rrq.Blocksize != DEFAULT_BLOCKSIZE {
+		t.Errorf("Bad blocksize: %v", rrq.Blocksize)
 		return
 	}
 }
@@ -92,8 +92,8 @@ func TestIgnoreUnknownOptions(t *testing.T) {
 		return
 	}
 
-	if rrq.blocksize != 5 {
-		t.Errorf("Bad blocksize: %v", rrq.blocksize)
+	if rrq.Blocksize != 5 {
+		t.Errorf("Bad blocksize: %v", rrq.Blocksize)
 		return
 	}
 }

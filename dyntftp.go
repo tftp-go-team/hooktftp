@@ -1,14 +1,15 @@
 package main
 
 import (
+	"github.com/epeli/dyntftp/tftp"
+	"flag"
 	"fmt"
+	"io"
 	"net"
 	"os"
-	"io"
-	"time"
-	"flag"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 var root = flag.String("root", "/var/lib/tftpboot/", "Serve files from")
@@ -17,35 +18,28 @@ var badinternet = flag.Bool("simulate-bad-internet", false, "Simulate bad intern
 var configPath = flag.String("config", "/etc/dyntftp.json", "Config file")
 var config *Config
 
-
-func SendFile(path string, blocksize int, addr *net.UDPAddr) {
-	path = filepath.Join(*root, path)
+func handleRRQ(req *tftp.Request, res *tftp.RRQresponse) {
+	path := filepath.Join(*root, req.Path)
 
 	started := time.Now()
 
-	rrq, err := NewRRQresponse(addr, blocksize, *badinternet)
-	if err != nil {
-		fmt.Println("Failed to create rrq", err)
-		return
-	}
-
-	path, err = filepath.Abs(path)
+	path, err := filepath.Abs(path)
 
 	if err != nil {
 		fmt.Println("Bad path", err)
-		rrq.WriteError(UNKNOWN_ERROR, "Invalid file path:" + err.Error())
+		res.WriteError(tftp.UNKNOWN_ERROR, "Invalid file path:"+err.Error())
 		return
 	}
-	fmt.Println("GET", path, "blocksize", rrq.blocksize)
+
+	fmt.Println("GET", path, "blocksize", req.Blocksize)
 
 	if !strings.HasPrefix(path, *root) {
 		fmt.Println("Path access violation", path)
-		rrq.WriteError(ACCESS_VIOLATION, "Path access violation")
+		res.WriteError(tftp.ACCESS_VIOLATION, "Path access violation")
 		return
 	}
 
-
-	if err := rrq.WriteOACK(); err != nil {
+	if err := res.WriteOACK(); err != nil {
 		fmt.Println("Failed to write OACK", err)
 		return
 	}
@@ -53,23 +47,22 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 	for _, hook := range config.Hooks {
 		if hook.Regexp.MatchString(path) {
 			// TODO: execute command
-			rrq.Write([]byte("customdata"))
-			rrq.End()
+			res.Write([]byte("customdata"))
+			res.End()
 			return
 		}
 	}
 
-
 	file, err := os.Open(path)
 	if err != nil {
 		fmt.Println("Failed to open file", path, err)
-		rrq.WriteError(NOT_FOUND, err.Error())
+		res.WriteError(tftp.NOT_FOUND, err.Error())
 		return
 	}
 
 	defer file.Close()
 
-	b := make([]byte, rrq.blocksize)
+	b := make([]byte, req.Blocksize)
 
 	totalBytes := 0
 
@@ -78,19 +71,19 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 		totalBytes += bytesRead
 
 		if err == io.EOF {
-			if _, err := rrq.Write(b[:bytesRead]); err != nil {
+			if _, err := res.Write(b[:bytesRead]); err != nil {
 				fmt.Println("Failed to write last bytes of the file", err)
 				return
 			}
-			rrq.End()
+			res.End()
 			break
 		} else if err != nil {
 			fmt.Println("Error while reading", file, err)
-			rrq.WriteError(UNKNOWN_ERROR, err.Error())
+			res.WriteError(tftp.UNKNOWN_ERROR, err.Error())
 			return
 		}
 
-		if _, err := rrq.Write(b[:bytesRead]); err != nil {
+		if _, err := res.Write(b[:bytesRead]); err != nil {
 			fmt.Println("Failed to write bytes for", path, err)
 			return
 		}
@@ -103,8 +96,6 @@ func SendFile(path string, blocksize int, addr *net.UDPAddr) {
 	fmt.Printf("Sent %v bytes in %v %f MB/s\n", totalBytes, took, speed)
 }
 
-
-
 func main() {
 	flag.Parse()
 	*root, _ = filepath.Abs(*root)
@@ -116,45 +107,26 @@ func main() {
 	}
 
 	fmt.Println("flags", *root, *port)
-	addr, err := net.ResolveUDPAddr("udp", ":" + *port)
+	addr, err := net.ResolveUDPAddr("udp", ":"+*port)
 	if err != nil {
 		fmt.Println("Failed to resolve address", err)
 		return
 	}
 
-	conn, err := net.ListenUDP("udp", addr)
+	server, err := tftp.NewTFTPServer(addr)
 	if err != nil {
-		fmt.Println("Failed to listen UDP" , err)
+		fmt.Println("Failed to listen", err)
 		return
 	}
 
-	data := make([]byte, 50)
-
 	for {
-		written, client_addr, err := conn.ReadFrom(data)
+		req, res, err := server.WaitForRequest()
 		if err != nil {
-			fmt.Println("Failed to read data from client:", err)
+			fmt.Println("Bad tftp request", err)
 			continue
 		}
 
-		raddr, err := net.ResolveUDPAddr("udp", client_addr.String())
-		if err != nil {
-			fmt.Println("Failed to resolve client address:", err)
-			continue
-		}
-
-		request, err := ParseRequest(data[:written])
-		if err != nil {
-			fmt.Println("Failed to parse request:", err)
-			continue
-		}
-
-		if request.opcode == RRQ {
-			go SendFile(request.path, request.blocksize, raddr)
-		} else {
-			fmt.Println("Unimplemented opcode:", request.opcode)
-		}
-
+		go handleRRQ(req, res)
 	}
 
 }

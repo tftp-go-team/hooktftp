@@ -1,4 +1,4 @@
-package main
+package tftp
 
 import (
 	"encoding/binary"

@@ -1,4 +1,4 @@
-package main
+package tftp
 
 import (
 	"encoding/binary"
@@ -32,6 +32,7 @@ func newRRQResonponse() (*RRQresponse, *MockConnection) {
 		make([]byte, 5),
 		blocksize,
 		0,
+		false,
 	}
 	return rrq, conn
 }
@@ -122,7 +123,7 @@ func Test2LargePackets(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(conn.datawritten[1], []byte{0, 3, 0, 2, 6, 7, 8, 9, 0}) {
-		t.Fatalf("Bad block written %v", conn.datawritten[1])
+		t.Fatalf("Bad block written g %v", conn.datawritten[1])
 	}
 
 	blocknum := binary.BigEndian.Uint16(conn.datawritten[0][2:])
