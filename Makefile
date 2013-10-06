@@ -3,19 +3,7 @@ build:
 	go install
 
 go-test:
-	cd regexptransform/
-	go test
-	cd ..
-
-	cd tftp
-	go test
-	cd ..
-
-	cd config
-	go test
-	cd ..
-
-	go test
+	tools/go-test-all.sh
 
 acceptance-test:
 	dyntftp -config test_config.json -port 1234 -root . &
