@@ -1,19 +1,18 @@
-package main
+package regexptransform
 
 import (
 	"errors"
-	// "fmt"
 	"regexp"
 	"strconv"
 )
 
 var NO_MATCH = errors.New("No match")
 var BAD_GROUPS = errors.New("Regexp has too few groups")
-type escape func(string) string
+type Escape func(string) string
 type Transform func(string) (string, error)
 var fieldPat = regexp.MustCompile("\\$([0-9]+)")
 
-func NewRegexpTransform(regexpStr, template string, escape escape) (Transform, error) {
+func NewRegexpTransform(regexpStr, template string, escape Escape) (Transform, error) {
 	pat, err := regexp.Compile(regexpStr)
 	if err != nil {
 		return nil, err
