@@ -6,6 +6,7 @@ import (
 	"github.com/epeli/dyntftp/hooks"
 	"io/ioutil"
 	"fmt"
+	"os"
 	"io"
 	"net"
 	"time"
@@ -33,6 +34,12 @@ func handleRRQ(res *tftp.RRQresponse) {
 		if err == hooks.NO_MATCH {
 			continue
 		} else if err != nil {
+
+			if err, ok := err.(*os.PathError); ok {
+				res.WriteError(tftp.NOT_FOUND, err.Error())
+				return
+			}
+
 			fmt.Printf("Failed to execute hook for '%v' error: %v", res.Request.Path, err)
 			res.WriteError(tftp.UNKNOWN_ERROR, "Hook exec failed")
 			return
