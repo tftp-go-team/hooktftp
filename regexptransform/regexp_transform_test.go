@@ -11,7 +11,7 @@ func dummyEscape(s string) string {
 type TransformTest struct {
 	regexp string
 	template string
-	escape escape
+	escape Escape
 	input string
 	output string
 	err error
