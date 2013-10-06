@@ -1,6 +1,6 @@
 
 build:
-	go install
+	go build
 
 go-test:
 	tools/go-test-all.sh
@@ -10,4 +10,3 @@ acceptance-test:
 	tools/acceptance.sh
 
 test: build go-test acceptance-test
-
