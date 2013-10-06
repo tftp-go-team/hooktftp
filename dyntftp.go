@@ -18,8 +18,8 @@ var badinternet = flag.Bool("simulate-bad-internet", false, "Simulate bad intern
 var configPath = flag.String("config", "/etc/dyntftp.json", "Config file")
 var config *Config
 
-func handleRRQ(req *tftp.Request, res *tftp.RRQresponse) {
-	path := filepath.Join(*root, req.Path)
+func handleRRQ(res *tftp.RRQresponse) {
+	path := filepath.Join(*root, res.Request.Path)
 
 	started := time.Now()
 
@@ -31,7 +31,7 @@ func handleRRQ(req *tftp.Request, res *tftp.RRQresponse) {
 		return
 	}
 
-	fmt.Println("GET", path, "blocksize", req.Blocksize)
+	fmt.Println("GET", path, "blocksize", res.Request.Blocksize)
 
 	if !strings.HasPrefix(path, *root) {
 		fmt.Println("Path access violation", path)
@@ -62,7 +62,7 @@ func handleRRQ(req *tftp.Request, res *tftp.RRQresponse) {
 
 	defer file.Close()
 
-	b := make([]byte, req.Blocksize)
+	b := make([]byte, res.Request.Blocksize)
 
 	totalBytes := 0
 
@@ -120,13 +120,13 @@ func main() {
 	}
 
 	for {
-		req, res, err := server.WaitForRequest()
+		res, err := server.Accept()
 		if err != nil {
 			fmt.Println("Bad tftp request", err)
 			continue
 		}
 
-		go handleRRQ(req, res)
+		go handleRRQ(res)
 	}
 
 }

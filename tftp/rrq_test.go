@@ -27,13 +27,18 @@ func (conn *MockConnection) ReadFrom(p []byte) (n int, addr net.Addr, err error)
 
 func newRRQResonponse() (*RRQresponse, *MockConnection) {
 	conn := &MockConnection{}
-	blocksize := 5
+	request := &Request{
+		RRQ,
+		5,
+		OCTET,
+		"/foo",
+	}
 	rrq := &RRQresponse{
 		conn,
-		make([]byte, blocksize+4),
+		make([]byte, request.Blocksize+4),
 		0,
 		make([]byte, 5),
-		blocksize,
+		request,
 		0,
 		false,
 	}
@@ -151,7 +156,6 @@ func TestOACK(t *testing.T) {
 	}
 
 }
-
 
 func TestErrorPacket(t *testing.T) {
 	rrq, conn := newRRQResonponse()

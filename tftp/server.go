@@ -10,33 +10,33 @@ type Server struct {
 	buffer []byte
 }
 
-func (server *Server) WaitForRequest() (*Request, *RRQresponse, error) {
+func (server *Server) Accept() (*RRQresponse, error) {
 
 		written, addr, err := server.conn.ReadFrom(server.buffer)
 		if err != nil {
-			return nil, nil, fmt.Errorf("Failed to read data from client: %v", err)
+			return nil, fmt.Errorf("Failed to read data from client: %v", err)
 		}
 
 		request, err := ParseRequest(server.buffer[:written])
 		if err != nil {
-			return nil, nil, fmt.Errorf("Failed to parse request: %v", err)
+			return nil, fmt.Errorf("Failed to parse request: %v", err)
 		}
 
 		if request.Opcode != RRQ {
-			return nil, nil, fmt.Errorf("Unkown opcode %v", request.Opcode)
+			return nil, fmt.Errorf("Unkown opcode %v", request.Opcode)
 		}
 
 		raddr, err := net.ResolveUDPAddr("udp", addr.String())
 		if err != nil {
-			return nil, nil, fmt.Errorf("Failed to resolve client address: %v", err)
+			return nil, fmt.Errorf("Failed to resolve client address: %v", err)
 		}
 
-		response, err := NewRRQresponse(raddr, request.Blocksize, false)
+		response, err := NewRRQresponse(raddr, request, false)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
-		return request, response, nil
+		return response, nil
 }
 
 

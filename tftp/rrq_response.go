@@ -19,7 +19,7 @@ type RRQresponse struct {
 	buffer      []byte
 	pos         int
 	ack         []byte
-	blocksize   int
+	Request     *Request
 	blocknum    uint16
 	badinternet bool
 }
@@ -37,7 +37,7 @@ func (res *RRQresponse) Write(p []byte) (int, error) {
 
 	bytecount := res.pos + len(p)
 
-	if bytecount < int(res.blocksize) {
+	if bytecount < int(res.Request.Blocksize) {
 		res.pos += copy(out[res.pos:], p)
 		return len(p), nil
 	}
@@ -47,7 +47,7 @@ func (res *RRQresponse) Write(p []byte) (int, error) {
 
 	res.pos += copied
 
-	if res.pos == int(res.blocksize) {
+	if res.pos == int(res.Request.Blocksize) {
 
 		_, err := res.writeBuffer()
 		if err != nil {
@@ -126,7 +126,7 @@ func (res *RRQresponse) WriteError(code uint16, message string) error {
 }
 
 func (res *RRQresponse) WriteOACK() error {
-	if res.blocksize == DEFAULT_BLOCKSIZE {
+	if res.Request.Blocksize == DEFAULT_BLOCKSIZE {
 		return nil
 	}
 
@@ -135,7 +135,7 @@ func (res *RRQresponse) WriteOACK() error {
 
 	oackbuffer = append(oackbuffer, []byte("blksize")...)
 	oackbuffer = append(oackbuffer, 0)
-	oackbuffer = append(oackbuffer, []byte(strconv.Itoa(res.blocksize))...)
+	oackbuffer = append(oackbuffer, []byte(strconv.Itoa(res.Request.Blocksize))...)
 	oackbuffer = append(oackbuffer, 0)
 
 	_, err := res.conn.Write(oackbuffer)
@@ -155,11 +155,11 @@ func (res *RRQresponse) WriteOACK() error {
 
 func (res *RRQresponse) End() (int, error) {
 	// Signal end of the transmission. This can be neither empty block or
-	// block smaller than res.blocksize
+	// block smaller than res.Request.Blocksize
 	return res.writeBuffer()
 }
 
-func NewRRQresponse(clientaddr *net.UDPAddr, blocksize int, badinternet bool) (*RRQresponse, error) {
+func NewRRQresponse(clientaddr *net.UDPAddr, request *Request, badinternet bool) (*RRQresponse, error) {
 
 	listenaddr, err := net.ResolveUDPAddr("udp", ":0")
 	if err != nil {
@@ -174,10 +174,10 @@ func NewRRQresponse(clientaddr *net.UDPAddr, blocksize int, badinternet bool) (*
 
 	return &RRQresponse{
 		conn,
-		make([]byte, blocksize+4),
+		make([]byte, request.Blocksize+4),
 		0,
 		make([]byte, 4),
-		blocksize,
+		request,
 		0,
 		badinternet,
 	}, nil
