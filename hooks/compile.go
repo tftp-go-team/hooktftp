@@ -1,8 +1,8 @@
 package hooks
 
 import (
-	"github.com/epeli/dyntftp/config"
-	"github.com/epeli/dyntftp/regexptransform"
+	"github.com/epeli/hooktftp/config"
+	"github.com/epeli/hooktftp/regexptransform"
 	"io"
 	"fmt"
 )

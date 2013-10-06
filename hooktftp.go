@@ -1,9 +1,9 @@
-package main
+package hooktftp
 
 import (
-	"github.com/epeli/dyntftp/tftp"
-	"github.com/epeli/dyntftp/config"
-	"github.com/epeli/dyntftp/hooks"
+	"github.com/epeli/hooktftp/tftp"
+	"github.com/epeli/hooktftp/config"
+	"github.com/epeli/hooktftp/hooks"
 	"io/ioutil"
 	"fmt"
 	"os"

@@ -1,7 +1,7 @@
 package hooks
 
 import (
-	"github.com/epeli/dyntftp/config"
+	"github.com/epeli/hooktftp/config"
 	"testing"
 )
 
