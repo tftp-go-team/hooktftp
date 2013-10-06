@@ -28,14 +28,46 @@ var hookTestCases = []hookTestCase{
 		"extension:txt",
 		"filecontents",
 	},
-	// {
-	// 	&config.HookDef{
-	// 		Regexp:       ".*",
-	// 		ShellTemplate: "echo shellhello",
-	// 	},
-	// 	"anything",
-	// 	"shellhello",
-	// },
+	{
+		&config.HookDef{
+			Regexp:       ".*",
+			ShellTemplate: "echo shellhello",
+		},
+		"anything",
+		"shellhello",
+	},
+	{
+		&config.HookDef{
+			Regexp:       "foo:(.*)",
+			ShellTemplate: "echo $1",
+		},
+		"foo:haha",
+		"haha",
+	},
+	{
+		&config.HookDef{
+			Regexp:       "foo:(.*)",
+			ShellTemplate: "echo $1",
+		},
+		"foo:$(hostname)",
+		"$(hostname)",
+	},
+	{
+		&config.HookDef{
+			Regexp:       "foo:(.*)",
+			ShellTemplate: "echo $1",
+		},
+		"foo:`hostname`",
+		"`hostname`",
+	},
+	{
+		&config.HookDef{
+			Regexp:       "foo:(.*)",
+			ShellTemplate: "echo $1",
+		},
+		"foo:$HOME",
+		"$HOME",
+	},
 }
 
 func TestFile(t *testing.T) {
@@ -52,17 +84,17 @@ func TestFile(t *testing.T) {
 			return
 		}
 
-		data := make([]byte, 12)
+		data := make([]byte, 20)
 		_, err = file.Read(data)
 		if err != nil {
 			t.Error("Failed to read file", file)
 			return
 		}
 
-		res := string(data)
+		res := string(data[:len(testCase.expected)])
 
 		if res != testCase.expected {
-			t.Error("Expected to find", testCase.expected, "from file but got:", res)
+			t.Errorf("Expected to find '%v' from file but got '%v'", testCase.expected,  res)
 		}
 	}
 

@@ -28,6 +28,9 @@ func CompileHook(hookDef *config.HookDef) (Hook, error) {
 	if hookDef.FileTemplate != "" {
 		template = hookDef.FileTemplate
 		components = FileHook
+	} else if hookDef.ShellTemplate != "" {
+		template = hookDef.ShellTemplate
+		components = ShellHook
 	} else {
 		return nil, fmt.Errorf("Cannot find template from hook %v", hookDef)
 	}
