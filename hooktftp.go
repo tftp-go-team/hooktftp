@@ -1,18 +1,20 @@
 package main
 
 import (
-	"github.com/epeli/hooktftp/tftp"
+	"flag"
+	"fmt"
 	"github.com/epeli/hooktftp/config"
 	"github.com/epeli/hooktftp/hooks"
-	"io/ioutil"
-	"fmt"
-	"os"
+	"github.com/epeli/hooktftp/tftp"
 	"io"
+	"io/ioutil"
 	"net"
+	"os"
 	"time"
 )
 
 var HOOKS []hooks.Hook
+var CONFIG_PATH string = "/etc/hooktftp.yml"
 
 func handleRRQ(res *tftp.RRQresponse) {
 
@@ -89,8 +91,19 @@ func handleRRQ(res *tftp.RRQresponse) {
 }
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [config]\n", os.Args[0])
+	}
+	flag.Parse()
 
-	configData, err := ioutil.ReadFile("./config_test.yml")
+	if len(flag.Args()) > 0 {
+		CONFIG_PATH = flag.Args()[0]
+	}
+
+	fmt.Println("Reading hooks from", CONFIG_PATH)
+
+	configData, err := ioutil.ReadFile(CONFIG_PATH)
+
 	if err != nil {
 		fmt.Println("Failed to read config", err)
 		return
