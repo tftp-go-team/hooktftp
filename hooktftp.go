@@ -1,4 +1,4 @@
-package hooktftp
+package main
 
 import (
 	"github.com/epeli/hooktftp/tftp"
