@@ -49,6 +49,8 @@ func CompileHook(hookDef *config.HookDef) (Hook, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		fmt.Println("Executing hook", hookDef)
 		reader, err := components.Execute(newPath)
 		if err != nil {
 			return nil, err
