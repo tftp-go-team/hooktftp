@@ -6,7 +6,7 @@ import (
 
 type HookDef struct {
 	Regexp          string "regexp"
-	CommandTemplate string "command"
+	ShellTemplate string "command"
 	UrlTemplate     string "url"
 	FileTemplate    string "file"
 }

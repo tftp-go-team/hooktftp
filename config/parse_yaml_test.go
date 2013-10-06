@@ -20,7 +20,7 @@ hooks:
 		HookDefs: []HookDef{
 			{
 				Regexp:  "^(.*)$",
-				CommandTemplate: "echo hello",
+				ShellTemplate: "echo hello",
 			},
 		},
 	},
