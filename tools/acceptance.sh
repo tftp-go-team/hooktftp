@@ -27,19 +27,22 @@ if [ ! -d fixtures ]; then
     exit 1
 fi
 
+./hooktftp config_test.yml &
+trap 'killall -v -9 hooktftp' EXIT 
+
 rm -rf $OUTDIR
 mkdir $OUTDIR
 
-echo "Fetching files"
-fetch small &
-fetch medium &
-fetch mod512 &
-fetch mod512double &
-fetch big &
-atftp --option "blksize 100" --get --remote-file fixtures/medium2 --local-file $OUTDIR/medium2 localhost 1234 &
-atftp --option "blksize 1536" --get --remote-file fixtures/big2 --local-file $OUTDIR/big2 localhost 1234 &
+sleep 2
 
-wait
+echo "Fetching files"
+fetch small
+fetch medium
+fetch mod512
+fetch mod512double
+fetch big
+atftp --option "blksize 100" --get --remote-file fixtures/medium2 --local-file $OUTDIR/medium2 localhost 1234
+atftp --option "blksize 1536" --get --remote-file fixtures/big2 --local-file $OUTDIR/big2 localhost 1234
 
 cd $OUTDIR
 sha1sum --check ../fixtures/SHA1SUMS
@@ -49,11 +52,6 @@ set +e
 ERROR_MESSAGE=$(atftp --get --remote-file small --local-file /dev/null localhost 1234 2>&1)
 set -e
 contains "$ERROR_MESSAGE" "no such file or directory"
-
-set +e
-ERROR_MESSAGE=$(atftp --get --remote-file ../foo.txt --local-file /dev/null localhost 1234 2>&1)
-set -e
-contains "$ERROR_MESSAGE" "Path access violation"
 
 atftp --get --remote-file custom.txt --local-file $OUTDIR/custom.txt localhost 1234
 CONTENT=$(cat $OUTDIR/custom.txt)

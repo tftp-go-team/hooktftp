@@ -1,6 +1,6 @@
 port: 1234
 hooks:
   - regexp: .*custom.*
-    shell: echo jea
+    shell: echo customdata
   - regexp: ^.*$
     file: ./$0
