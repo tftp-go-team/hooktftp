@@ -1,4 +1,5 @@
 language: go
+install: go get
 script: make test
 go:
   - 1.1
