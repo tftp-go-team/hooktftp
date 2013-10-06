@@ -10,11 +10,11 @@ type yamlExample struct {
 	expectedConfig Config
 }
 
-var commandHookTest = yamlExample{
+var shellHookTest = yamlExample{
 	`
 hooks:
   - regexp: ^(.*)$
-    command: echo hello
+    shell: echo hello
 `,
 	Config{
 		HookDefs: []HookDef{
@@ -85,7 +85,7 @@ user: hook
 			Host: "0.0.0.0",
 		},
 	},
-	commandHookTest,
+	shellHookTest,
 	urlHookTest,
 }
 
@@ -99,7 +99,7 @@ func TestExamples(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(*config, example.expectedConfig) {
-			t.Error(config, "!=", example.expectedConfig)
+			t.Errorf("Expected '%v' to match '%v'", config, example.expectedConfig)
 		}
 
 	}
