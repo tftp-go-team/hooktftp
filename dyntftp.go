@@ -2,83 +2,68 @@ package main
 
 import (
 	"github.com/epeli/dyntftp/tftp"
-	"flag"
+	"github.com/epeli/dyntftp/config"
+	"github.com/epeli/dyntftp/hooks"
+	"io/ioutil"
 	"fmt"
 	"io"
 	"net"
-	"os"
-	"path/filepath"
-	"strings"
 	"time"
 )
 
-var root = flag.String("root", "/var/lib/tftpboot/", "Serve files from")
-var port = flag.String("port", "69", "Port to listen")
-var badinternet = flag.Bool("simulate-bad-internet", false, "Simulate bad internet connection for testing purposes")
-var configPath = flag.String("config", "/etc/dyntftp.json", "Config file")
-var config *Config
+var HOOKS []hooks.Hook
 
 func handleRRQ(res *tftp.RRQresponse) {
-	path := filepath.Join(*root, res.Request.Path)
 
 	started := time.Now()
 
-	path, err := filepath.Abs(path)
-
-	if err != nil {
-		fmt.Println("Bad path", err)
-		res.WriteError(tftp.UNKNOWN_ERROR, "Invalid file path:"+err.Error())
-		return
-	}
+	path := res.Request.Path
 
 	fmt.Println("GET", path, "blocksize", res.Request.Blocksize)
-
-	if !strings.HasPrefix(path, *root) {
-		fmt.Println("Path access violation", path)
-		res.WriteError(tftp.ACCESS_VIOLATION, "Path access violation")
-		return
-	}
 
 	if err := res.WriteOACK(); err != nil {
 		fmt.Println("Failed to write OACK", err)
 		return
 	}
 
-	for _, hook := range config.Hooks {
-		if hook.Regexp.MatchString(path) {
-			// TODO: execute command
-			res.Write([]byte("customdata"))
-			res.End()
+	var reader io.Reader
+	for _, hook := range HOOKS {
+		var err error
+		reader, err = hook(res.Request.Path)
+		if err == hooks.NO_MATCH {
+			continue
+		} else if err != nil {
+			fmt.Printf("Failed to execute hook for '%v' error: %v", res.Request.Path, err)
+			res.WriteError(tftp.UNKNOWN_ERROR, "Hook exec failed")
 			return
 		}
+		break
 	}
 
-	file, err := os.Open(path)
-	if err != nil {
-		fmt.Println("Failed to open file", path, err)
-		res.WriteError(tftp.NOT_FOUND, err.Error())
+	if reader == nil {
+		res.WriteError(tftp.NOT_FOUND, "No hook matches")
 		return
 	}
 
-	defer file.Close()
+	// TODO: close!!
 
 	b := make([]byte, res.Request.Blocksize)
 
 	totalBytes := 0
 
 	for {
-		bytesRead, err := file.Read(b)
+		bytesRead, err := reader.Read(b)
 		totalBytes += bytesRead
 
 		if err == io.EOF {
 			if _, err := res.Write(b[:bytesRead]); err != nil {
-				fmt.Println("Failed to write last bytes of the file", err)
+				fmt.Println("Failed to write last bytes of the reader", err)
 				return
 			}
 			res.End()
 			break
 		} else if err != nil {
-			fmt.Println("Error while reading", file, err)
+			fmt.Println("Error while reading", reader, err)
 			res.WriteError(tftp.UNKNOWN_ERROR, err.Error())
 			return
 		}
@@ -97,17 +82,30 @@ func handleRRQ(res *tftp.RRQresponse) {
 }
 
 func main() {
-	flag.Parse()
-	*root, _ = filepath.Abs(*root)
-	var err error
-	config, err = ParseConfigFile(*configPath)
+
+	configData, err := ioutil.ReadFile("./config_test.yml")
 	if err != nil {
-		fmt.Println("Failed to parse", *configPath, err)
+		fmt.Println("Failed to read config", err)
 		return
 	}
 
-	fmt.Println("flags", *root, *port)
-	addr, err := net.ResolveUDPAddr("udp", ":"+*port)
+	conf, err := config.ParseYaml(configData)
+	if err != nil {
+		fmt.Println("Failed to parse config", err)
+		return
+	}
+
+	for _, hookDef := range conf.HookDefs {
+		fmt.Println("Compiling hook", hookDef)
+		hook, err := hooks.CompileHook(&hookDef)
+		if err != nil {
+			fmt.Println("Failed to compile hook", hookDef, err)
+			return
+		}
+		HOOKS = append(HOOKS, hook)
+	}
+
+	addr, err := net.ResolveUDPAddr("udp", ":"+conf.Port)
 	if err != nil {
 		fmt.Println("Failed to resolve address", err)
 		return
