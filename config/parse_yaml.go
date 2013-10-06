@@ -5,10 +5,10 @@ import (
 )
 
 type HookDef struct {
-	Regexp  string "regexp"
-	Command string "command"
-	Url     string "url"
-	File    string "file"
+	Regexp          string "regexp"
+	CommandTemplate string "command"
+	UrlTemplate     string "url"
+	FileTemplate    string "file"
 }
 
 type Config struct {

@@ -20,7 +20,7 @@ hooks:
 		HookDefs: []HookDef{
 			{
 				Regexp:  "^(.*)$",
-				Command: "echo hello",
+				CommandTemplate: "echo hello",
 			},
 		},
 	},
@@ -36,7 +36,7 @@ hooks:
 		HookDefs: []HookDef{
 			{
 				Regexp:  "^(.*)$",
-				Url: "http://hello",
+				UrlTemplate: "http://hello",
 			},
 		},
 	},
@@ -52,7 +52,7 @@ hooks:
 		HookDefs: []HookDef{
 			{
 				Regexp:  "^(.*)$",
-				File: "/var/tftpboot/default",
+				FileTemplate: "/var/tftpboot/default",
 			},
 		},
 	},
