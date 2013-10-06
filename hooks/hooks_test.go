@@ -68,6 +68,14 @@ var hookTestCases = []hookTestCase{
 		"foo:$HOME",
 		"$HOME",
 	},
+	{
+		&config.HookDef{
+			Regexp:       "(.*)",
+			ShellTemplate: "echo $1; exit 1",
+		},
+		"foo",
+		"foo",
+	},
 }
 
 func TestFile(t *testing.T) {
@@ -87,7 +95,7 @@ func TestFile(t *testing.T) {
 		data := make([]byte, 20)
 		_, err = file.Read(data)
 		if err != nil {
-			t.Error("Failed to read file", file)
+			t.Error("Failed to read file", testCase.hookDef,  file)
 			return
 		}
 
