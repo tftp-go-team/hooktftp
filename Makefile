@@ -11,6 +11,9 @@ go-test:
 	go test
 	cd ..
 
+	cd config
+	go test
+	cd ..
 
 	go test
 
