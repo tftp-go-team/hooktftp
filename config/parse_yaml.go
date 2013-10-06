@@ -10,14 +10,15 @@ type HookDef struct {
 	Url     string "url"
 	File    string "file"
 }
+
 type Config struct {
-	Port  string "port"
-	Host  string "host"
-	User  string "user"
+	Port     string    "port"
+	Host     string    "host"
+	User     string    "user"
 	HookDefs []HookDef "hooks"
 }
 
-func ParseYaml(yaml []byte) (*Config, error)  {
+func ParseYaml(yaml []byte) (*Config, error) {
 	var config Config
 	err := goyaml.Unmarshal(yaml, &config)
 	if err != nil {
