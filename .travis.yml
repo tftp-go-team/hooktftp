@@ -1,5 +1,7 @@
 language: go
-install: go get
+install:
+  - sudo apt-get install atftp
+  - go get
 script: make test
 go:
   - 1.1
