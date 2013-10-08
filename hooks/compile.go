@@ -1,12 +1,14 @@
 package hooks
 
 import (
+	"errors"
 	"fmt"
 	"github.com/epeli/hooktftp/regexptransform"
 	"io"
 )
 
 var NO_MATCH = regexptransform.NO_MATCH
+var INVALID_HOOK = errors.New("invalid hook")
 
 type HookComponents struct {
 	Execute func(string) (io.Reader, error)
@@ -19,46 +21,46 @@ type iHookDef interface {
 	GetFileTemplate() string
 }
 
-type Hook func(string) (io.Reader, error)
+type HookCore interface {
+	NewReader(string) (io.Reader, error)
+	Transform(string) (string, error)
+}
 
-func CompileHook(hookDef iHookDef) (Hook, error) {
-	var template string
-	var components HookComponents
+type Hook struct {
+	core      HookCore
+}
 
-	if hookDef.GetRegexp() == "" {
-		return nil, fmt.Errorf("Cannot find regexp from hook %v", hookDef)
-	}
+type NewHookCore func(iHookDef) (HookCore, error)
 
-	if t := hookDef.GetFileTemplate(); t != "" {
-		template = t
-		components = FileHook
-	} else if t := hookDef.GetShellTemplate(); t != "" {
-		template = t
-		components = ShellHook
-	} else {
-		return nil, fmt.Errorf("Cannot find template from hook %v", hookDef)
-	}
-
-	transform, err := regexptransform.NewRegexpTransform(
-		hookDef.GetRegexp(),
-		template,
-		components.escape,
-	)
+func (h *Hook) Execute(path string) (io.Reader, error) {
+	transformedPath, err := h.core.Transform(path)
 	if err != nil {
 		return nil, err
 	}
+	return h.core.NewReader(transformedPath)
+}
 
-	return func(path string) (io.Reader, error) {
-		newPath, err := transform(path)
+func CompileHook(hookDef iHookDef) (*Hook, error) {
+	hookCoreCreators := []NewHookCore{
+		NewFileHookCore,
+	}
+
+	var hook *Hook
+	for _, newCore := range hookCoreCreators {
+		core, err := newCore(hookDef)
+		if err == INVALID_HOOK {
+			continue
+		}
 		if err != nil {
-			return nil, err
+			return hook, err
 		}
 
-		fmt.Println("Executing hook", hookDef)
-		reader, err := components.Execute(newPath)
-		if err != nil {
-			return nil, err
-		}
-		return reader, nil
-	}, nil
+		hook = &Hook{core}
+	}
+
+	if hook == nil {
+		return hook, fmt.Errorf("Failed to compile hook from %v", hookDef)
+	}
+
+	return hook, nil
 }
