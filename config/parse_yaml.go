@@ -18,6 +18,18 @@ type Config struct {
 	HookDefs []HookDef "hooks"
 }
 
+func (d *HookDef) GetRegexp() string {
+	return d.Regexp
+}
+
+func (d *HookDef) GetShellTemplate() string {
+	return d.ShellTemplate
+}
+
+func (d *HookDef) GetFileTemplate() string {
+	return d.FileTemplate
+}
+
 func ParseYaml(yaml []byte) (*Config, error) {
 	var config Config
 	err := goyaml.Unmarshal(yaml, &config)

@@ -1,42 +1,46 @@
 package hooks
 
 import (
-	"github.com/epeli/hooktftp/config"
+	"fmt"
 	"github.com/epeli/hooktftp/regexptransform"
 	"io"
-	"fmt"
 )
 
 var NO_MATCH = regexptransform.NO_MATCH
 
 type HookComponents struct {
 	Execute func(string) (io.Reader, error)
-	escape regexptransform.Escape
+	escape  regexptransform.Escape
 }
 
+type iHookDef interface {
+	GetRegexp() string
+	GetShellTemplate() string
+	GetFileTemplate() string
+}
 
 type Hook func(string) (io.Reader, error)
 
-func CompileHook(hookDef *config.HookDef) (Hook, error) {
+func CompileHook(hookDef iHookDef) (Hook, error) {
 	var template string
 	var components HookComponents
 
-	if hookDef.Regexp == "" {
+	if hookDef.GetRegexp() == "" {
 		return nil, fmt.Errorf("Cannot find regexp from hook %v", hookDef)
 	}
 
-	if hookDef.FileTemplate != "" {
-		template = hookDef.FileTemplate
+	if t := hookDef.GetFileTemplate(); t != "" {
+		template = t
 		components = FileHook
-	} else if hookDef.ShellTemplate != "" {
-		template = hookDef.ShellTemplate
+	} else if t := hookDef.GetShellTemplate(); t != "" {
+		template = t
 		components = ShellHook
 	} else {
 		return nil, fmt.Errorf("Cannot find template from hook %v", hookDef)
 	}
 
 	transform, err := regexptransform.NewRegexpTransform(
-		hookDef.Regexp,
+		hookDef.GetRegexp(),
 		template,
 		components.escape,
 	)
