@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"os/user"
+	"syscall"
 	"time"
 )
 
@@ -153,6 +155,22 @@ func main() {
 	}
 
 	fmt.Println("Listening on", conf.Port)
+
+	if conf.User != "" {
+		err := DropPrivileges(conf.User)
+		if err != nil {
+			fmt.Printf("Failed to drop privileges to '%s' error: %v", conf.User, err)
+			return
+		}
+		currentUser, _ := user.Current()
+		fmt.Println("Dropped privileges to", currentUser)
+	}
+
+	if conf.User == "" && syscall.Getuid() == 0 {
+		fmt.Println("!!!!!!!!!")
+		fmt.Println("WARNING: Running as root and 'user' is not set in", CONFIG_PATH)
+		fmt.Println("!!!!!!!!!")
+	}
 
 	for {
 		res, err := server.Accept()

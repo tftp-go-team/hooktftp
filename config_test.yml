@@ -1,4 +1,5 @@
 port: 1234
+# user: hooktftp
 hooks:
 
   - name: Shell hook
