@@ -27,6 +27,7 @@ Hooks consists of following keys:
     - Hook is executed when this regexp matches the requested path.
   - `file`, `url` or `shell`: A template where the regexp is expanded.
     - One is required.
+    - Determines the type of the hook
 
 Regexp can be expanded to the template using the `$0`, `$1`, `$1` etc.
 variables. `$0` is the full matched regexp and rest are the matched regexp
