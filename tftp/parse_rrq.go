@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"strconv"
+	"net"
 )
 
 type Request struct {
@@ -11,6 +12,7 @@ type Request struct {
 	Blocksize int
 	Mode      int
 	Path      string
+	Addr      *net.Addr
 }
 
 type RRQParseError struct {

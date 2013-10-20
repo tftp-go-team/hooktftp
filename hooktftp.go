@@ -22,7 +22,11 @@ func handleRRQ(res *tftp.RRQresponse) {
 
 	path := res.Request.Path
 
-	fmt.Println("GET", path, "blocksize", res.Request.Blocksize)
+	fmt.Println(
+		"GET", path,
+		"blocksize", res.Request.Blocksize,
+		"from", *res.Request.Addr,
+	)
 
 	if err := res.WriteOACK(); err != nil {
 		fmt.Println("Failed to write OACK", err)
@@ -43,12 +47,11 @@ func handleRRQ(res *tftp.RRQresponse) {
 			}
 
 			fmt.Printf("Failed to execute hook for '%v' error: %v", res.Request.Path, err)
-			res.WriteError(tftp.UNKNOWN_ERROR, "Hook failed: " + err.Error())
+			res.WriteError(tftp.UNKNOWN_ERROR, "Hook failed: "+err.Error())
 			return
 		}
-		defer func(){
+		defer func() {
 			err := reader.Close()
-			fmt.Println("Closing reader for", res.Request.Path)
 			if err != nil {
 				fmt.Println("Failed to close reader for", res.Request.Path, err)
 			}
@@ -148,6 +151,8 @@ func main() {
 		fmt.Println("Failed to listen", err)
 		return
 	}
+
+	fmt.Println("Listening on", conf.Port)
 
 	for {
 		res, err := server.Accept()

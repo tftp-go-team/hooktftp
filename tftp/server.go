@@ -6,41 +6,41 @@ import (
 )
 
 type Server struct {
-	conn *net.UDPConn
+	conn   *net.UDPConn
 	buffer []byte
 }
 
 func (server *Server) Accept() (*RRQresponse, error) {
 
-		written, addr, err := server.conn.ReadFrom(server.buffer)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to read data from client: %v", err)
-		}
+	written, addr, err := server.conn.ReadFrom(server.buffer)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to read data from client: %v", err)
+	}
 
-		request, err := ParseRequest(server.buffer[:written])
-		if err != nil {
-			return nil, fmt.Errorf("Failed to parse request: %v", err)
-		}
+	request, err := ParseRequest(server.buffer[:written])
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse request: %v", err)
+	}
+	request.Addr = &addr
 
-		if request.Opcode != RRQ {
-			return nil, fmt.Errorf("Unkown opcode %v", request.Opcode)
-		}
+	if request.Opcode != RRQ {
+		return nil, fmt.Errorf("Unkown opcode %v", request.Opcode)
+	}
 
-		raddr, err := net.ResolveUDPAddr("udp", addr.String())
-		if err != nil {
-			return nil, fmt.Errorf("Failed to resolve client address: %v", err)
-		}
+	raddr, err := net.ResolveUDPAddr("udp", addr.String())
+	if err != nil {
+		return nil, fmt.Errorf("Failed to resolve client address: %v", err)
+	}
 
-		response, err := NewRRQresponse(raddr, request, false)
-		if err != nil {
-			return nil, err
-		}
+	response, err := NewRRQresponse(raddr, request, false)
+	if err != nil {
+		return nil, err
+	}
 
-		return response, nil
+	return response, nil
 }
 
-
-func NewTFTPServer(addr *net.UDPAddr) (*Server, error){
+func NewTFTPServer(addr *net.UDPAddr) (*Server, error) {
 
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {

@@ -59,7 +59,7 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 			return nil, err
 		}
 
-		fmt.Println("Executing hook:", hookDef)
+		fmt.Println("Executing hook:", hookDef, path, "->", newPath)
 		reader, err := components.Execute(newPath)
 		if err != nil {
 			return nil, err

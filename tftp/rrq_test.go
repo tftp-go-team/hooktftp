@@ -32,6 +32,7 @@ func newRRQResonponse() (*RRQresponse, *MockConnection) {
 		5,
 		OCTET,
 		"/foo",
+		nil,
 	}
 	rrq := &RRQresponse{
 		conn,
