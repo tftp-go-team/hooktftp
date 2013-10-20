@@ -116,7 +116,7 @@ func main() {
 	}
 
 	for _, hookDef := range conf.HookDefs {
-		fmt.Println("Compiling hook", hookDef.GetName())
+		fmt.Println("Compiling hook", hookDef)
 
 		// Create new hookDef variable for the hookDef pointer for each loop
 		// iteration. Go reuses the hookDef variable and if we pass pointer to

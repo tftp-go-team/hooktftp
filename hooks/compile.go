@@ -14,6 +14,7 @@ type HookComponents struct {
 }
 
 type iHookDef interface {
+	GetName() string
 	GetRegexp() string
 	GetShellTemplate() string
 	GetFileTemplate() string

@@ -5,6 +5,7 @@ import (
 )
 
 type HookDef struct {
+	Name          string "name"
 	Regexp        string "regexp"
 	ShellTemplate string "shell"
 	UrlTemplate   string "url"
@@ -16,6 +17,10 @@ type Config struct {
 	Host     string    "host"
 	User     string    "user"
 	HookDefs []HookDef "hooks"
+}
+
+func (d *HookDef) GetName() string {
+	return d.Name
 }
 
 func (d *HookDef) GetRegexp() string {
