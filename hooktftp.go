@@ -43,7 +43,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 			}
 
 			fmt.Printf("Failed to execute hook for '%v' error: %v", res.Request.Path, err)
-			res.WriteError(tftp.UNKNOWN_ERROR, "Hook exec failed")
+			res.WriteError(tftp.UNKNOWN_ERROR, "Hook failed: " + err.Error())
 			return
 		}
 		defer func(){

@@ -7,7 +7,7 @@ hooks:
 
   - name: Url hook
     regexp: .*url\/(.*)$
-    url: http://localhost:8000/Makefile
+    url: http://localhost:8000/fixtures/$1
 
   - name: File hook
     regexp: ^.*$

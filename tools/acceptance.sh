@@ -3,6 +3,7 @@
 OUTDIR="out$1"
 
 set -eu
+set -x
 
 fetch() {
     echo "Fetching $1"
@@ -27,8 +28,19 @@ if [ ! -d fixtures ]; then
     exit 1
 fi
 
+python -m SimpleHTTPServer &
+http_server_pid=$!
+
 ./hooktftp config_test.yml &
-trap 'killall -v -9 hooktftp' EXIT 
+tftp_server_pid=$!
+
+on_exit(){
+    echo "Killing tftp server pid $tftp_server_pid"
+    kill -9 $tftp_server_pid
+    echo "Killing http server pid $http_server_pid"
+    kill -9 $http_server_pid
+}
+trap on_exit EXIT
 
 rm -rf $OUTDIR
 mkdir $OUTDIR
@@ -41,6 +53,7 @@ fetch medium
 fetch mod512
 fetch mod512double
 fetch big
+atftp --get --remote-file url/webfile --local-file $OUTDIR/webfile localhost 1234
 atftp --option "blksize 100" --get --remote-file fixtures/medium2 --local-file $OUTDIR/medium2 localhost 1234
 atftp --option "blksize 1536" --get --remote-file fixtures/big2 --local-file $OUTDIR/big2 localhost 1234
 

@@ -1,6 +1,6 @@
 language: go
 install:
-  - sudo apt-get install atftp
+  - sudo apt-get install -y atftp python
   - go get
 script: make test
 go:
