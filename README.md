@@ -60,13 +60,14 @@ To put it all together:
 port: 69
 user: hooktftp
 hooks:
+  - name: Boot configurations
+    regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
+    url: http://localhost:8080/bootconfigurations/$1
+    
   - name: Boot files
     regexp: ^.*$
     file: /var/lib/tftpboot/$0
 
-  - name: Boot configurations
-    regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
-    url: http://localhost:8080/bootconfigurations/$1
 ```
 
 # Downloads
