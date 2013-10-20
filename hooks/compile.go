@@ -9,7 +9,7 @@ import (
 var NO_MATCH = regexptransform.NO_MATCH
 
 type HookComponents struct {
-	Execute func(string) (io.Reader, error)
+	Execute func(string) (io.ReadCloser, error)
 	escape  regexptransform.Escape
 }
 
@@ -21,7 +21,7 @@ type iHookDef interface {
 	GetUrlTemplate() string
 }
 
-type Hook func(string) (io.Reader, error)
+type Hook func(string) (io.ReadCloser, error)
 
 func CompileHook(hookDef iHookDef) (Hook, error) {
 	var template string
@@ -53,13 +53,13 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 		return nil, err
 	}
 
-	return func(path string) (io.Reader, error) {
+	return func(path string) (io.ReadCloser, error) {
 		newPath, err := transform(path)
 		if err != nil {
 			return nil, err
 		}
 
-		fmt.Println("Executing hook", hookDef)
+		fmt.Println("Executing hook:", hookDef)
 		reader, err := components.Execute(newPath)
 		if err != nil {
 			return nil, err

@@ -12,7 +12,7 @@ import (
 var shellEscape = regexp.MustCompile("([^A-Za-z0-9_\\-.,:\\/@\n])")
 
 var ShellHook = HookComponents{
-	func(command string) (io.Reader, error) {
+	func(command string) (io.ReadCloser, error) {
 		cmd := exec.Command("sh", "-c", command)
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {

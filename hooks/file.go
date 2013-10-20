@@ -7,7 +7,7 @@ import (
 )
 
 var FileHook = HookComponents{
-	func (path string) (io.Reader, error) {
+	func (path string) (io.ReadCloser, error) {
 		file, err := os.Open(path)
 		if err != nil {
 			return nil, err

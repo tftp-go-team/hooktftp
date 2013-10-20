@@ -29,7 +29,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 		return
 	}
 
-	var reader io.Reader
+	var reader io.ReadCloser
 	for _, hook := range HOOKS {
 		var err error
 		reader, err = hook(res.Request.Path)
@@ -46,6 +46,13 @@ func handleRRQ(res *tftp.RRQresponse) {
 			res.WriteError(tftp.UNKNOWN_ERROR, "Hook exec failed")
 			return
 		}
+		defer func(){
+			err := reader.Close()
+			fmt.Println("Closing reader for", res.Request.Path)
+			if err != nil {
+				fmt.Println("Failed to close reader for", res.Request.Path, err)
+			}
+		}()
 		break
 	}
 
