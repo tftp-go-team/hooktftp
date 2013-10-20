@@ -3,6 +3,7 @@ package hooks
 import (
 	"io"
 	"net/http"
+	"fmt"
 )
 
 var UrlHook = HookComponents{
@@ -11,6 +12,10 @@ var UrlHook = HookComponents{
 		res, err := http.Get(url)
 		if err != nil {
 			return nil, err
+		}
+
+		if res.StatusCode != 200 {
+			return nil, fmt.Errorf("Bad response '%v' from %v", res.Status, url)
 		}
 
 		return res.Body, nil
