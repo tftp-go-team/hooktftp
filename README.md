@@ -41,8 +41,7 @@ regexp: ^.*$
 file: /var/lib/tftpboot/$0
 ```
 
-Or to share custom boot configurations for PXELINUX from a http server based on
-mac address:
+Share custom boot configurations for PXELINUX from a custom http server:
 
 ```yaml
 name: Boot configurations
@@ -68,6 +67,6 @@ hooks:
     url: http://localhost:8080/bootconfigurations/$1
 ```
 
-# Releases
+# Downloads
 
 See <https://github.com/epeli/hooktftp/releases>
