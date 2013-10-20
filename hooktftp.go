@@ -116,8 +116,13 @@ func main() {
 	}
 
 	for _, hookDef := range conf.HookDefs {
-		fmt.Println("Compiling hook", hookDef)
-		hook, err := hooks.CompileHook(&hookDef)
+		fmt.Println("Compiling hook", hookDef.GetName())
+
+		// Create new hookDef variable for the hookDef pointer for each loop
+		// iteration. Go reuses the hookDef variable and if we pass pointer to
+		// that terrible things happen.
+		newPointer := hookDef
+		hook, err := hooks.CompileHook(&newPointer)
 		if err != nil {
 			fmt.Println("Failed to compile hook", hookDef, err)
 			return
