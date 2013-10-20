@@ -1,6 +1,14 @@
 port: 1234
 hooks:
-  - regexp: .*custom.*
+
+  - name: Shell hook
+    regexp: .*custom.*
     shell: echo customdata
-  - regexp: ^.*$
+
+  - name: Url hook
+    regexp: .*url\/(.*)$
+    url: http://localhost:8000/Makefile
+
+  - name: File hook
+    regexp: ^.*$
     file: ./$0

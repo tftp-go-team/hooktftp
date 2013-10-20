@@ -35,6 +35,10 @@ func (d *HookDef) GetFileTemplate() string {
 	return d.FileTemplate
 }
 
+func (d *HookDef) GetUrlTemplate() string {
+	return d.UrlTemplate
+}
+
 func ParseYaml(yaml []byte) (*Config, error) {
 	var config Config
 	err := goyaml.Unmarshal(yaml, &config)

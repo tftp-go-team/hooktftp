@@ -18,6 +18,7 @@ type iHookDef interface {
 	GetRegexp() string
 	GetShellTemplate() string
 	GetFileTemplate() string
+	GetUrlTemplate() string
 }
 
 type Hook func(string) (io.Reader, error)
@@ -36,6 +37,9 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 	} else if t := hookDef.GetShellTemplate(); t != "" {
 		template = t
 		components = ShellHook
+	} else if t := hookDef.GetUrlTemplate(); t != "" {
+		template = t
+		components = UrlHook
 	} else {
 		return nil, fmt.Errorf("Cannot find template from hook %v", hookDef)
 	}
