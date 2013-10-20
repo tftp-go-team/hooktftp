@@ -55,7 +55,7 @@ To put it all together:
 
 
 ```yaml
-port: 1234
+port: 69
 user: hooktftp
 hooks:
   - name: Boot files
