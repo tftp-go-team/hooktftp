@@ -4,7 +4,10 @@ package hooks
 import (
 	"os"
 	"io"
+	"regexp"
 )
+
+var pathEscape = regexp.MustCompile("\\.\\.\\/")
 
 var FileHook = HookComponents{
 	func (path string) (io.ReadCloser, error) {
@@ -15,6 +18,6 @@ var FileHook = HookComponents{
 		return file, nil
 	},
 	func (s string) string{
-		return s
+		return pathEscape.ReplaceAllLiteralString(s, "")
 	},
 }

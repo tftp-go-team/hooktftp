@@ -47,6 +47,15 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
+				Regexp:       ".*",
+				FileTemplate: "$0",
+			},
+			"../file_fixture.txt",
+			"filecontents",
+			noError,
+		},
+		{
+			&config.HookDef{
 				Regexp:       "^extension:(.*)$",
 				FileTemplate: "file_fixture.$1",
 			},
