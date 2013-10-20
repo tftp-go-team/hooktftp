@@ -33,6 +33,8 @@ Regexp can be expanded to the template using the `$0`, `$1`, `$1` etc.
 variables. `$0` is the full matched regexp and rest are the matched regexp
 groups.
 
+### Example
+
 For example to share files from `/var/lib/tftpboot` add following hook:
 
 ```yaml
