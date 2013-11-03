@@ -14,39 +14,35 @@ type HookComponents struct {
 }
 
 type iHookDef interface {
-	GetName() string
+	GetType() string
+	GetDescription() string
 	GetRegexp() string
-	GetShellTemplate() string
-	GetFileTemplate() string
-	GetUrlTemplate() string
+	GetTemplate() string
 }
 
 type Hook func(string) (io.ReadCloser, error)
 
+var hookMap = map[string]HookComponents{
+	"file":  FileHook,
+	"url":   UrlHook,
+	"shell": ShellHook,
+}
+
 func CompileHook(hookDef iHookDef) (Hook, error) {
-	var template string
+	var ok bool
 	var components HookComponents
 
 	if hookDef.GetRegexp() == "" {
 		return nil, fmt.Errorf("Cannot find regexp from hook %v", hookDef)
 	}
 
-	if t := hookDef.GetFileTemplate(); t != "" {
-		template = t
-		components = FileHook
-	} else if t := hookDef.GetShellTemplate(); t != "" {
-		template = t
-		components = ShellHook
-	} else if t := hookDef.GetUrlTemplate(); t != "" {
-		template = t
-		components = UrlHook
-	} else {
+	if components, ok = hookMap[hookDef.GetType()]; !ok {
 		return nil, fmt.Errorf("Cannot find template from hook %v", hookDef)
 	}
 
 	transform, err := regexptransform.NewRegexpTransform(
 		hookDef.GetRegexp(),
-		template,
+		hookDef.GetTemplate(),
 		components.escape,
 	)
 	if err != nil {

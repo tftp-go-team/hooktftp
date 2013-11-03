@@ -13,14 +13,16 @@ type yamlExample struct {
 var shellHookTest = yamlExample{
 	`
 hooks:
-  - regexp: ^(.*)$
-    shell: echo hello
+  - type: shell
+    regexp: ^(.*)$
+    template: echo hello
 `,
 	Config{
 		HookDefs: []HookDef{
 			{
+				Type: "shell",
 				Regexp:  "^(.*)$",
-				ShellTemplate: "echo hello",
+				Template: "echo hello",
 			},
 		},
 	},
@@ -29,14 +31,16 @@ hooks:
 var urlHookTest = yamlExample{
 	`
 hooks:
-  - regexp: ^(.*)$
-    url: http://hello
+  - type: url
+    regexp: ^(.*)$
+    template: http://hello
 `,
 	Config{
 		HookDefs: []HookDef{
 			{
+				Type: "url",
 				Regexp:  "^(.*)$",
-				UrlTemplate: "http://hello",
+				Template: "http://hello",
 			},
 		},
 	},
@@ -45,14 +49,15 @@ hooks:
 var fileHookTest = yamlExample{
 	`
 hooks:
-  - regexp: ^(.*)$
-    file: /var/tftpboot/default
+  - type: file
+    regexp: ^(.*)$
+    template: /var/tftpboot/default
 `,
 	Config{
 		HookDefs: []HookDef{
 			{
 				Regexp:  "^(.*)$",
-				FileTemplate: "/var/tftpboot/default",
+				Template: "/var/tftpboot/default",
 			},
 		},
 	},

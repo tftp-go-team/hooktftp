@@ -22,12 +22,13 @@ Config file is in yaml format and it can contain following keys:
 
 Hooks consists of following keys:
 
-  - `name`: Name of the hook.
+  - `type`: Type of the hook
+    - `file`: Get response from file system
+    - `url`: Get reponse from a HTTP server
+    - `shell`: Get response from external application
   - `regexp`: Regexp matcher.
     - Hook is executed when this regexp matches the requested path.
-  - `file`, `url` or `shell`: A template where the regexp is expanded.
-    - One is required.
-    - Determines the type of the hook
+  - `template`: A template where the regexp is expanded.
 
 Regexp can be expanded to the template using the `$0`, `$1`, `$1` etc.
 variables. `$0` is the full matched regexp and rest are the matched regexp
@@ -38,7 +39,7 @@ groups.
 Share files from `/var/lib/tftpboot` add following hook:
 
 ```yaml
-name: Boot files
+type: file
 regexp: ^.*$
 file: /var/lib/tftpboot/$0
 ```
@@ -46,7 +47,7 @@ file: /var/lib/tftpboot/$0
 Share custom boot configurations for PXELINUX from a custom http server:
 
 ```yaml
-name: Boot configurations
+type: url
 regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
 url: http://localhost:8080/bootconfigurations/$1
 ```
@@ -60,14 +61,13 @@ To put it all together:
 port: 69
 user: hooktftp
 hooks:
-  - name: Boot configurations
-    regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
-    url: http://localhost:8080/bootconfigurations/$1
-    
-  - name: Boot files
+  - type: file
     regexp: ^.*$
     file: /var/lib/tftpboot/$0
 
+  - type: url
+    regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
+    url: http://localhost:8080/bootconfigurations/$1
 ```
 
 # Downloads

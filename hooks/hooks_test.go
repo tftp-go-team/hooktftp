@@ -9,9 +9,9 @@ import (
 )
 
 type hookTestCase struct {
-	hookDef  *config.HookDef
-	input    string
-	expected string
+	hookDef        *config.HookDef
+	input          string
+	expected       string
 	errorValidator func(error) error
 }
 
@@ -38,8 +38,9 @@ func TestHooks(t *testing.T) {
 	var hookTestCases = []hookTestCase{
 		{
 			&config.HookDef{
-				Regexp:       ".*",
-				FileTemplate: "file_fixture.txt",
+				Type:     "file",
+				Regexp:   ".*",
+				Template: "file_fixture.txt",
 			},
 			"anything",
 			"filecontents",
@@ -47,8 +48,9 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:       ".*",
-				FileTemplate: "$0",
+				Type:     "file",
+				Regexp:   ".*",
+				Template: "$0",
 			},
 			"../file_fixture.txt",
 			"filecontents",
@@ -56,8 +58,9 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:       "^extension:(.*)$",
-				FileTemplate: "file_fixture.$1",
+				Type:     "file",
+				Regexp:   "^extension:(.*)$",
+				Template: "file_fixture.$1",
 			},
 			"extension:txt",
 			"filecontents",
@@ -65,8 +68,9 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:        ".*",
-				ShellTemplate: "echo shellhello",
+				Type:     "shell",
+				Regexp:   ".*",
+				Template: "echo shellhello",
 			},
 			"anything",
 			"shellhello",
@@ -74,8 +78,9 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:        "foo:(.*)",
-				ShellTemplate: "echo $1",
+				Type:     "shell",
+				Regexp:   "foo:(.*)",
+				Template: "echo $1",
 			},
 			"foo:haha",
 			"haha",
@@ -83,8 +88,9 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:        "foo:(.*)",
-				ShellTemplate: "echo $1",
+				Type:     "shell",
+				Regexp:   "foo:(.*)",
+				Template: "echo $1",
 			},
 			"foo:$(hostname)",
 			"$(hostname)",
@@ -92,8 +98,9 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:        "foo:(.*)",
-				ShellTemplate: "echo $1",
+				Type:     "shell",
+				Regexp:   "foo:(.*)",
+				Template: "echo $1",
 			},
 			"foo:`hostname`",
 			"`hostname`",
@@ -101,8 +108,9 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:        "foo:(.*)",
-				ShellTemplate: "echo $1",
+				Type:     "shell",
+				Regexp:   "foo:(.*)",
+				Template: "echo $1",
 			},
 			"foo:$HOME",
 			"$HOME",
@@ -110,8 +118,9 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:        "(.*)",
-				ShellTemplate: "echo $1; exit 1",
+				Type:     "shell",
+				Regexp:   "(.*)",
+				Template: "echo $1; exit 1",
 			},
 			"foo",
 			"foo",
@@ -119,8 +128,9 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:       "url\\/(.+)$",
-				UrlTemplate: ts.URL + "/test/$1",
+				Type:     "url",
+				Regexp:   "url\\/(.+)$",
+				Template: ts.URL + "/test/$1",
 			},
 			"url/web.txt",
 			"RES:web.txt",
@@ -128,12 +138,13 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Regexp:       "url\\/(.+)$",
-				UrlTemplate: ts.URL + "/bad",
+				Type: "url",
+				Regexp:      "url\\/(.+)$",
+				Template: ts.URL + "/bad",
 			},
 			"url/bad.txt",
 			"bad response",
-			func (err error) error {
+			func(err error) error {
 				if err == nil {
 					return fmt.Errorf("Bad url response test failed: Expected to have an error")
 				}

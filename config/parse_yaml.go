@@ -5,11 +5,10 @@ import (
 )
 
 type HookDef struct {
-	Name          string "name"
-	Regexp        string "regexp"
-	ShellTemplate string "shell"
-	UrlTemplate   string "url"
-	FileTemplate  string "file"
+	Description string "description"
+	Type        string "type"
+	Regexp      string "regexp"
+	Template    string "template"
 }
 
 type Config struct {
@@ -19,24 +18,21 @@ type Config struct {
 	HookDefs []HookDef "hooks"
 }
 
-func (d *HookDef) GetName() string {
-	return d.Name
+
+func (d *HookDef) GetType() string {
+	return d.Type
+}
+
+func (d *HookDef) GetTemplate() string {
+	return d.Template
+}
+
+func (d *HookDef) GetDescription() string {
+	return d.Description
 }
 
 func (d *HookDef) GetRegexp() string {
 	return d.Regexp
-}
-
-func (d *HookDef) GetShellTemplate() string {
-	return d.ShellTemplate
-}
-
-func (d *HookDef) GetFileTemplate() string {
-	return d.FileTemplate
-}
-
-func (d *HookDef) GetUrlTemplate() string {
-	return d.UrlTemplate
 }
 
 func ParseYaml(yaml []byte) (*Config, error) {

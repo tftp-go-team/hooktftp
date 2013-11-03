@@ -2,14 +2,17 @@ port: 1234
 # user: hooktftp
 hooks:
 
-  - name: Shell hook
+  - type: shell
+    description: Shell hook
     regexp: .*custom.*
-    shell: echo customdata
+    template: echo customdata
 
-  - name: Url hook
+  - type: url
+    description: Url hook
     regexp: .*url\/(.*)$
-    url: http://localhost:8000/fixtures/$1
+    template: http://localhost:8000/fixtures/$1
 
-  - name: File hook
+  - type: file
+    description: File hook
     regexp: ^.*$
-    file: ./$0
+    template: ./$0
