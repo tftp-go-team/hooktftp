@@ -20,26 +20,26 @@ hooks:
 	Config{
 		HookDefs: []HookDef{
 			{
-				Type: "shell",
-				Regexp:  "^(.*)$",
+				Type:     "shell",
+				Regexp:   "^(.*)$",
 				Template: "echo hello",
 			},
 		},
 	},
 }
 
-var urlHookTest = yamlExample{
+var httpHookTest = yamlExample{
 	`
 hooks:
-  - type: url
+  - type: http
     regexp: ^(.*)$
     template: http://hello
 `,
 	Config{
 		HookDefs: []HookDef{
 			{
-				Type: "url",
-				Regexp:  "^(.*)$",
+				Type:     "http",
+				Regexp:   "^(.*)$",
 				Template: "http://hello",
 			},
 		},
@@ -56,14 +56,12 @@ hooks:
 	Config{
 		HookDefs: []HookDef{
 			{
-				Regexp:  "^(.*)$",
+				Regexp:   "^(.*)$",
 				Template: "/var/tftpboot/default",
 			},
 		},
 	},
 }
-
-
 
 var parseTests = []yamlExample{
 	{
@@ -91,7 +89,7 @@ user: hook
 		},
 	},
 	shellHookTest,
-	urlHookTest,
+	httpHookTest,
 }
 
 func TestExamples(t *testing.T) {

@@ -24,7 +24,7 @@ Hooks consists of following keys:
 
   - `type`: Type of the hook
     - `file`: Get response from file system
-    - `url`: Get reponse from a HTTP server
+    - `http`: Get reponse from a HTTP server
     - `shell`: Get response from external application
   - `regexp`: Regexp matcher.
     - Hook is executed when this regexp matches the requested path.
@@ -41,15 +41,15 @@ Share files from `/var/lib/tftpboot` add following hook:
 ```yaml
 type: file
 regexp: ^.*$
-file: /var/lib/tftpboot/$0
+template: /var/lib/tftpboot/$0
 ```
 
 Share custom boot configurations for PXELINUX from a custom http server:
 
 ```yaml
-type: url
+type: http
 regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
-url: http://localhost:8080/bootconfigurations/$1
+template: http: http://localhost:8080/bootconfigurations/$1
 ```
 
 The order of the hooks matter. The first one matched is used.
@@ -63,11 +63,11 @@ user: hooktftp
 hooks:
   - type: file
     regexp: ^.*$
-    file: /var/lib/tftpboot/$0
+    template: /var/lib/tftpboot/$0
 
-  - type: url
+  - type: http
     regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
-    url: http://localhost:8080/bootconfigurations/$1
+    template: http://localhost:8080/bootconfigurations/$1
 ```
 
 # Downloads

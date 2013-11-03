@@ -128,7 +128,7 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Type:     "url",
+				Type:     "http",
 				Regexp:   "url\\/(.+)$",
 				Template: ts.URL + "/test/$1",
 			},
@@ -138,8 +138,8 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
-				Type: "url",
-				Regexp:      "url\\/(.+)$",
+				Type:     "http",
+				Regexp:   "url\\/(.+)$",
 				Template: ts.URL + "/bad",
 			},
 			"url/bad.txt",

@@ -24,7 +24,7 @@ type Hook func(string) (io.ReadCloser, error)
 
 var hookMap = map[string]HookComponents{
 	"file":  FileHook,
-	"url":   UrlHook,
+	"http":  HTTPHook,
 	"shell": ShellHook,
 }
 

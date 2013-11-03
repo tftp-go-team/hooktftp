@@ -3,16 +3,13 @@ port: 1234
 hooks:
 
   - type: shell
-    description: Shell hook
     regexp: .*custom.*
     template: echo customdata
 
-  - type: url
-    description: Url hook
+  - type: http
     regexp: .*url\/(.*)$
     template: http://localhost:8000/fixtures/$1
 
   - type: file
-    description: File hook
     regexp: ^.*$
     template: ./$0

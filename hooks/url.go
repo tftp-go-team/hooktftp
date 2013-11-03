@@ -1,12 +1,12 @@
 package hooks
 
 import (
+	"fmt"
 	"io"
 	"net/http"
-	"fmt"
 )
 
-var UrlHook = HookComponents{
+var HTTPHook = HookComponents{
 	func(url string) (io.ReadCloser, error) {
 
 		res, err := http.Get(url)

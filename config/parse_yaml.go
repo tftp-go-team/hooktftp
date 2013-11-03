@@ -18,7 +18,6 @@ type Config struct {
 	HookDefs []HookDef "hooks"
 }
 
-
 func (d *HookDef) GetType() string {
 	return d.Type
 }
