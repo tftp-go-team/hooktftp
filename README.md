@@ -82,7 +82,7 @@ server            | size | concurrency | count | blocksize | time
 ----------------- |------|-------------|-------|---------- |-----
 puavo-tftp (ruby) | 11M  | 1           | 10    | 512       | 0m27.012s
 hooktftp   (Go)   | 11M  | 1           | 10    | 512       | 0m16.126s
-atftpd     (C)    | 11M  | 1           | 10    | 512       | 0m14.409s
+tftp-hpa   (C)    | 11M  | 1           | 10    | 512       | 0m14.409s
 
 
     time tools/speed-concurrent.sh
@@ -91,7 +91,7 @@ server            | size | concurrency | count | blocksize | time
 ----------------- |------|-------------|-------|---------- |-----
 puavo-tftp (ruby) | 11M  | 10          | 10    | 512       | 0m59.869s
 hooktftp   (Go)   | 11M  | 10          | 10    | 512       | 0m24.531s
-tftp-hpa     (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken?
+tftp-hpa   (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken?
 
 
 # Downloads
