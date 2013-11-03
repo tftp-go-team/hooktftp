@@ -52,7 +52,7 @@ Share custom boot configurations for PXELINUX from a custom http server:
 ```yaml
 type: http
 regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
-template: http: http://localhost:8080/boot/$1
+template: http://localhost:8080/boot/$1
 ```
 
 The order of the hooks matter. The first one matched is used.
