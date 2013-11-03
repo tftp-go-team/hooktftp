@@ -69,7 +69,7 @@ hooks:
 
   - type: http
     regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
-    template: http: http://localhost:8080/boot/$1
+    template: http://localhost:8080/boot/$1
 ```
 
 ## Silly benchmarks
