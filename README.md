@@ -91,7 +91,7 @@ server            | size | concurrency | count | blocksize | time
 ----------------- |------|-------------|-------|---------- |-----
 puavo-tftp (ruby) | 11M  | 10          | 10    | 512       | 0m59.869s
 hooktftp   (Go)   | 11M  | 10          | 10    | 512       | 0m24.531s
-tftp-hpa   (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken?
+tftp-hpa   (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken test?
 
 
 # Downloads
