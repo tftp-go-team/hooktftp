@@ -2,7 +2,10 @@
 
 # hooktftp
 
-Hook based tftp server written in Go.
+Hook based tftp server inspired by [puavo-tftp]. It's written in Go in the hope
+of being faster and more stable.
+
+It's intented to be used with [PXELINUX][] for dynamic mac address based boots.
 
 ## Usage
 
@@ -14,21 +17,21 @@ Config will be read from `/etc/hooktftp.yml` by default.
 
 Config file is in yaml format and it can contain following keys:
 
-  - `port`: Port to listen (required).
-  - `user`: User to drop privileges to.
-  - `hooks`: Array of hooks. One or more is required.
+  - `port`: Port to listen (required)
+  - `user`: User to drop privileges to
+  - `hooks`: Array of hooks. One or more is required
 
 ### Hooks
 
 Hooks consists of following keys:
 
   - `type`: Type of the hook
-    - `file`: Get response from file system
+    - `file`: Get response from the file system
     - `http`: Get reponse from a HTTP server
     - `shell`: Get response from external application
-  - `regexp`: Regexp matcher.
-    - Hook is executed when this regexp matches the requested path.
-  - `template`: A template where the regexp is expanded.
+  - `regexp`: Regexp matcher
+    - Hook is executed when this regexp matches the requested path
+  - `template`: A template where the regexp is expanded
 
 Regexp can be expanded to the template using the `$0`, `$1`, `$1` etc.
 variables. `$0` is the full matched regexp and rest are the matched regexp
@@ -49,13 +52,12 @@ Share custom boot configurations for PXELINUX from a custom http server:
 ```yaml
 type: http
 regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
-template: http: http://localhost:8080/bootconfigurations/$1
+template: http: http://localhost:8080/boot/$1
 ```
 
 The order of the hooks matter. The first one matched is used.
 
 To put it all together:
-
 
 ```yaml
 port: 69
@@ -67,12 +69,12 @@ hooks:
 
   - type: http
     regexp: pxelinux.cfg\/01-(([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2})
-    template: http://localhost:8080/bootconfigurations/$1
+    template: http: http://localhost:8080/boot/$1
 ```
 
 ## Silly benchmarks
 
-On AMD Phenom II X4 965 and SSD
+On AMD Phenom II X4 965 and Samsung SSD
 
     time tools/speed.sh
 
@@ -89,10 +91,12 @@ server            | size | concurrency | count | blocksize | time
 ----------------- |------|-------------|-------|---------- |-----
 puavo-tftp (ruby) | 11M  | 10          | 10    | 512       | 0m59.869s
 hooktftp   (Go)   | 11M  | 10          | 10    | 512       | 0m24.531s
-atftpd     (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken?
+tftp-hpa     (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken?
 
 
 # Downloads
 
 See <https://github.com/epeli/hooktftp/releases>
 
+[puavo-tftp]: https://github.com/opinsys/puavo-tftp
+[PXELINUX]: http://www.syslinux.org/wiki/index.php/PXELINUX
