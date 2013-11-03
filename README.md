@@ -70,6 +70,29 @@ hooks:
     template: http://localhost:8080/bootconfigurations/$1
 ```
 
+## Silly benchmarks
+
+On AMD Phenom II X4 965 and SSD
+
+    time tools/speed.sh
+
+server            | size | concurrency | count | blocksize | time
+----------------- |------|-------------|-------|---------- |-----
+puavo-tftp (ruby) | 11M  | 1           | 10    | 512       | 0m27.012s
+hooktftp   (Go)   | 11M  | 1           | 10    | 512       | 0m16.126s
+atftpd     (C)    | 11M  | 1           | 10    | 512       | 0m14.409s
+
+
+    time tools/speed-concurrent.sh
+
+server            | size | concurrency | count | blocksize | time
+----------------- |------|-------------|-------|---------- |-----
+puavo-tftp (ruby) | 11M  | 10          | 10    | 512       | 0m59.869s
+hooktftp   (Go)   | 11M  | 10          | 10    | 512       | 0m24.531s
+atftpd     (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken?
+
+
 # Downloads
 
 See <https://github.com/epeli/hooktftp/releases>
+
