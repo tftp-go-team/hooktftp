@@ -39,7 +39,7 @@ groups.
 
 ### Example
 
-Share files from `/var/lib/tftpboot` add following hook:
+To share files from `/var/lib/tftpboot` add following hook:
 
 ```yaml
 type: file
