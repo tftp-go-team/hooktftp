@@ -27,7 +27,7 @@ Hooks consists of following keys:
 
   - `type`: Type of the hook
     - `file`: Get response from the file system
-    - `http`: Get reponse from a HTTP server
+    - `http`: Get response from a HTTP server
     - `shell`: Get response from external application
   - `regexp`: Regexp matcher
     - Hook is executed when this regexp matches the requested path
