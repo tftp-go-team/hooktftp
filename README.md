@@ -98,5 +98,28 @@ tftp-hpa   (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken te
 
 See <https://github.com/epeli/hooktftp/releases>
 
+# Compiling
+
+Get Go 1.1 or later and setup a Go workspace.
+
+    mkdir workspace
+    cd workspace
+    export GOPATH="$(pwd)"
+    mkdir -p src/github.com/epeli
+    git clone https://github.com/epeli/hooktftp.git src/github.com/epeli/hooktftp
+
+Then get dependencies and build it.
+
+    cd src/github.com/epeli/hooktftp
+    go get
+    go build
+
+Now you should have a standalone hooktftp binary.
+
+    ./hooktftp -h
+    Usage: ./hooktftp [config]
+
+Please tell me if you know simpler method to build this.
+
 [puavo-tftp]: https://github.com/opinsys/puavo-tftp
 [PXELINUX]: http://www.syslinux.org/wiki/index.php/PXELINUX
