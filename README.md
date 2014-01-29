@@ -94,10 +94,6 @@ hooktftp   (Go)   | 11M  | 10          | 10    | 512       | 0m24.531s
 tftp-hpa   (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken test?
 
 
-# Downloads
-
-See <https://github.com/epeli/hooktftp/releases>
-
 # Compiling
 
 Get Go 1.1 or later and setup a Go workspace.
