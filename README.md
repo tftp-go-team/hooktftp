@@ -11,7 +11,9 @@ from the filesystem.
 This is server inspired by [puavo-tftp]. It's written in Go in the hope of
 being faster and more stable.
 
-It's intented to be used with [PXELINUX][] for dynamic mac address based boots.
+It's intented to be used with [PXELINUX][] for dynamic mac address based boot configurations.
+This can be very useful in [LTSP][] enviroments.
+
 
 ## Usage
 
@@ -145,3 +147,4 @@ Please tell me if you know simpler method to build this.
 
 [puavo-tftp]: https://github.com/opinsys/puavo-tftp
 [PXELINUX]: http://www.syslinux.org/wiki/index.php/PXELINUX
+[LTSP]: http://www.ltsp.org/
