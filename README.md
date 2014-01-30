@@ -93,8 +93,26 @@ puavo-tftp (ruby) | 11M  | 10          | 10    | 512       | 0m59.869s
 hooktftp   (Go)   | 11M  | 10          | 10    | 512       | 0m24.531s
 tftp-hpa   (C)    | 11M  | 10          | 10    | 512       | 0m10.326s Broken test?
 
+# Install
 
-# Compiling
+## apt-get
+
+Add to `/etc/apt/sources.list`
+
+    deb http://archive.opinsys.fi/hooktftp precise main
+
+And install `hooktftp` package.
+
+  sudo apt-get update
+  sudo apt-get install hooktftp
+
+Or just pick up .deb package from <http://archive.opinsys.fi/hooktftp/pool/precise/main/h/hooktftp/>
+
+There are currently only 64bit Ubuntu Precise packages. But the package is so
+simple it will likely work just fine on latter Ubuntu 64bit versions too and
+probably on 64bit debian also.
+
+## Compiling from sources
 
 Get Go 1.1 or later and setup a Go workspace.
 
