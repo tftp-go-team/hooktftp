@@ -6,7 +6,7 @@ set -x
 # https://go.googlecode.com/files/go1.2.linux-amd64.tar.gz
 # https://go.googlecode.com/files/go1.2.linux-386.tar.gz
 
-sudo apt-get install bzr wget --yes
+sudo apt-get install bzr wget atftp --yes
 
 arch=
 processor="$(uname --processor)"
