@@ -7,13 +7,13 @@ set -x
 # https://go.googlecode.com/files/go1.2.linux-386.tar.gz
 
 sudo apt-get update
-sudo apt-get install wget puavo-devscripts --yes --force-yes
+sudo apt-get install wget puavo-devscripts gcc --yes --force-yes
 
 arch=
-processor="$(uname --processor)"
+processor="$(gcc -dumpmachine)"
 
-[ "$processor" = "i686" ] && arch="386"
-[ "$processor" = "x86_64" ] && arch="amd64"
+[ "$processor" = "i686-linux-gnu" ] && arch="386"
+[ "$processor" = "x86_64-linux-gnu" ] && arch="amd64"
 if [ "$arch" = "" ]; then
     echo "Unknown processor $processor"
     exit 1
