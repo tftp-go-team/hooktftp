@@ -108,6 +108,8 @@ to `/etc/apt/sources.list` and install `hooktftp` package
 
 or just pick up .deb package from <http://archive.opinsys.fi/hooktftp/pool/precise/main/h/hooktftp/>.
 
+After installing you should have `hooktftp` executable in your PATH.
+
 There are currently only 64bit Ubuntu Precise packages. But the package is so
 simple it will likely work just fine on latter Ubuntu 64bit versions too and
 probably on 64bit debian also.
