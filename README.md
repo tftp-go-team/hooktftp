@@ -3,8 +3,8 @@
 # hooktftp
 
 Hooktftp is a dynamic read-only TFTP server. It's dynamic in a sense it is
-executes hooks on matched on read requests (RRQ) instead of reading files from
-the file system.  Hooks are matched with regular expressions and on match
+executes hooks matched on read requests (RRQ) instead of reading files from
+the file system. Hooks are matched with regular expressions and on match
 hooktftp will execute a script, issue a HTTP GET request or just reads the file
 from the filesystem.
 
