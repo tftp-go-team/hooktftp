@@ -6,7 +6,7 @@ set -x
 # https://go.googlecode.com/files/go1.2.linux-amd64.tar.gz
 # https://go.googlecode.com/files/go1.2.linux-386.tar.gz
 
-sudo apt-get install bzr wget atftp --yes
+sudo apt-get install wget puavo-devscripts --yes
 
 arch=
 processor="$(uname --processor)"
@@ -37,8 +37,9 @@ mkdir -p src/github.com/epeli
 mv ../hooktftp src/github.com/epeli
 cd src/github.com/epeli/hooktftp
 
-go get
-make
-make test
+puavo-build-debian-dir
+sudo puavo-install-deps debian/control
+puavo-dch $(cat VERSION)
+puavo-debuild
 
-echo "BUILD OK!"
+aptirepo-upload -r $APTIREPO_REMOTE -b "git-$(echo "$GIT_BRANCH" | cut -d / -f 2)" ../hooktftp*.changes
