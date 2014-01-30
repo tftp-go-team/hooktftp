@@ -44,3 +44,4 @@ puavo-dch $(cat VERSION)
 puavo-debuild
 
 aptirepo-upload -r $APTIREPO_REMOTE -b "git-$(echo "$GIT_BRANCH" | cut -d / -f 2)" ../hooktftp*.changes
+aptirepo-upload -r $APTIREPO_REMOTE -b hooktftp ../hooktftp*.changes
