@@ -105,6 +105,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [config]\n", os.Args[0])
+		fmt.Println("\nSee https://github.com/epeli/hooktftp\n")
 	}
 	flag.Parse()
 
