@@ -2,8 +2,14 @@
 
 # hooktftp
 
-Hook based tftp server inspired by [puavo-tftp]. It's written in Go in the hope
-of being faster and more stable.
+Hooktftp is a dynamic read-only TFTP server. It's dynamic in a sense it is
+executes hooks on matched on read requests (RRQ) instead of reading files from
+the file system.  Hooks are matched with regular expressions and on match
+hooktftp will execute a script, issue a HTTP GET request or just reads the file
+from the filesystem.
+
+This is server inspired by [puavo-tftp]. It's written in Go in the hope of
+being faster and more stable.
 
 It's intented to be used with [PXELINUX][] for dynamic mac address based boots.
 
