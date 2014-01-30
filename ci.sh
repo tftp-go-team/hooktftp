@@ -6,6 +6,7 @@ set -x
 # https://go.googlecode.com/files/go1.2.linux-amd64.tar.gz
 # https://go.googlecode.com/files/go1.2.linux-386.tar.gz
 
+sudo apt-get update
 sudo apt-get install wget puavo-devscripts --yes
 
 arch=
