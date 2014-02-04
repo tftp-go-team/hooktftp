@@ -66,7 +66,6 @@ func handleRRQ(res *tftp.RRQresponse) {
 		return
 	}
 
-	// TODO: close!!
 
 	b := make([]byte, res.Request.Blocksize)
 
