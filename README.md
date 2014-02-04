@@ -124,27 +124,18 @@ probably on 64bit debian also.
 
 ## Compiling from sources
 
-Get Go 1.1 or later and setup a Go workspace.
+[Install Go][] (1.1 or later). Assuming you've successfully set up GOPATH and have GOPATH/bin on your path, simply:
+    
+    go get github.com/epeli/hooktftp
+    
+Now you should have a standalone hooktftp binary on your path.
 
-    mkdir workspace
-    cd workspace
-    export GOPATH="$(pwd)"
-    mkdir -p src/github.com/epeli
-    git clone https://github.com/epeli/hooktftp.git src/github.com/epeli/hooktftp
+    hooktftp -h
+    Usage: hooktftp [config]
 
-Then get dependencies and build it.
-
-    cd src/github.com/epeli/hooktftp
-    go get
-    go build
-
-Now you should have a standalone hooktftp binary.
-
-    ./hooktftp -h
-    Usage: ./hooktftp [config]
-
-Please tell me if you know simpler method to build this.
+To implement changes, run `go install` from `$GOPATH/src/github.com/epeli/hooktftp` and the binary on your path will reflect your most recent changes.
 
 [puavo-tftp]: https://github.com/opinsys/puavo-tftp
 [PXELINUX]: http://www.syslinux.org/wiki/index.php/PXELINUX
 [LTSP]: http://www.ltsp.org/
+[Install Go]: http://golang.org/doc/install
