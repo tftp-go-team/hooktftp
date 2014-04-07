@@ -1,7 +1,7 @@
 package config
 
 import (
-	"launchpad.net/goyaml"
+	"gopkg.in/yaml.v1"
 )
 
 type HookDef struct {
@@ -34,9 +34,9 @@ func (d *HookDef) GetRegexp() string {
 	return d.Regexp
 }
 
-func ParseYaml(yaml []byte) (*Config, error) {
+func ParseYaml(yamlv1 []byte) (*Config, error) {
 	var config Config
-	err := goyaml.Unmarshal(yaml, &config)
+	err := yaml.Unmarshal(yamlv1, &config)
 	if err != nil {
 		return nil, err
 	}
