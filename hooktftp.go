@@ -142,7 +142,7 @@ func main() {
 		HOOKS = append(HOOKS, hook)
 	}
 
-	addr, err := net.ResolveUDPAddr("udp", ":"+conf.Port)
+	addr, err := net.ResolveUDPAddr("udp", conf.Host+":"+conf.Port)
 	if err != nil {
 		fmt.Println("Failed to resolve address", err)
 		return
@@ -154,7 +154,7 @@ func main() {
 		return
 	}
 
-	fmt.Println("Listening on", conf.Port)
+	fmt.Println("Listening on", conf.Host, conf.Port)
 
 	if conf.User != "" {
 		err := DropPrivileges(conf.User)
