@@ -142,6 +142,10 @@ func main() {
 		HOOKS = append(HOOKS, hook)
 	}
 
+	if conf.Port == "" {
+		conf.Port = "69"
+	}
+
 	addr, err := net.ResolveUDPAddr("udp", ":"+conf.Port)
 	if err != nil {
 		fmt.Println("Failed to resolve address", err)
