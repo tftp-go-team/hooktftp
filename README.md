@@ -124,7 +124,8 @@ probably on 64bit debian also.
 
 ## Compiling from sources
 
-[Install Go][] (1.1 or later). Assuming you've successfully set up GOPATH and have GOPATH/bin on your path, simply:
+[Install Go][] (1.1 or later), make sure you have git and bazaar too. 
+Assuming you've successfully set up GOPATH and have GOPATH/bin on your path, simply:
     
     go get github.com/epeli/hooktftp
     
