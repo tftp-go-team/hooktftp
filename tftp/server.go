@@ -49,7 +49,7 @@ func NewTFTPServer(addr *net.UDPAddr) (*Server, error) {
 
 	return &Server{
 		conn,
-		make([]byte, 50),
+		make([]byte, 2048),
 	}, nil
 
 }
