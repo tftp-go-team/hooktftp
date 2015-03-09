@@ -30,11 +30,6 @@ func handleRRQ(res *tftp.RRQresponse) {
 		"from", *res.Request.Addr,
 	)
 
-	if err := res.WriteOACK(); err != nil {
-		fmt.Println("Failed to write OACK", err)
-		return
-	}
-
 	var reader io.ReadCloser
 	for _, hook := range HOOKS {
 		var err error
@@ -66,6 +61,10 @@ func handleRRQ(res *tftp.RRQresponse) {
 		return
 	}
 
+	if err := res.WriteOACK(); err != nil {
+		fmt.Println("Failed to write OACK", err)
+		return
+	}
 
 	b := make([]byte, res.Request.Blocksize)
 
