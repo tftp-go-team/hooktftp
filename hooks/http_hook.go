@@ -14,7 +14,8 @@ var HTTPHook = HookComponents{
 			return nil, err
 		}
 
-		if res.StatusCode != 200 {
+		if res.StatusCode != http.StatusOK {
+			res.Body.Close()
 			return nil, fmt.Errorf("Bad response '%v' from %v", res.Status, url)
 		}
 
