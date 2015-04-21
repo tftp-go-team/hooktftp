@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/epeli/hooktftp/config"
-	"github.com/epeli/hooktftp/hooks"
-	"github.com/epeli/hooktftp/tftp"
+	"./config"
+	"./hooks"
+	"./tftp"
 	"io"
 	"io/ioutil"
 	"net"

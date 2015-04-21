@@ -8,8 +8,30 @@ import (
 
 var HTTPHook = HookComponents{
 	func(url string) (io.ReadCloser, error) {
+		client := &http.Client {
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				if len(via) == 0 {
+					return nil
+				}
 
-		res, err := http.Get(url)
+				for key, val := range via[0].Header {
+					if key != "Referer" {
+						req.Header[key] = val
+					}
+				}
+
+				return nil
+			},
+		}
+
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("User-Agent", "hooktftp v0.9.1")
+
+		res, err := client.Do(req)
 		if err != nil {
 			return nil, err
 		}

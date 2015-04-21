@@ -2,7 +2,7 @@ package hooks
 
 import (
 	"fmt"
-	"github.com/epeli/hooktftp/regexptransform"
+	"../regexptransform"
 	"io"
 )
 
