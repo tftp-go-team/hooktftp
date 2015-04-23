@@ -1,0 +1,5 @@
+# TODO
+
+Some features to implement...
+
+  * Implements syslog (golang "log/syslog")
