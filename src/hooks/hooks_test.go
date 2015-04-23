@@ -2,7 +2,7 @@ package hooks
 
 import (
 	"fmt"
-	"github.com/epeli/hooktftp/config"
+	"../config"
 	"net/http"
 	"net/http/httptest"
 	"testing"
