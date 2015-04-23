@@ -1,7 +1,0 @@
-#!/bin/sh
-
-set -eu
-
-git_hash=$(git rev-parse HEAD)
-
-tar czvf "hooktftp.${git_hash}.$(uname --machine).tar.gz" hooktftp
