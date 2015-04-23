@@ -1,0 +1,6 @@
+port: 69
+user: root
+hooks:
+  - type: http
+    regexp: (.*)$
+    template: http://localhost/$1
