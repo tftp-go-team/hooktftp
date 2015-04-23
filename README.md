@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/epeli/hooktftp.png?branch=master)](https://travis-ci.org/epeli/hooktftp)
-
 # hooktftp
 
 Hooktftp is a dynamic read-only TFTP server. It's dynamic in a sense it is
@@ -8,7 +6,7 @@ the file system. Hooks are matched with regular expressions and on match
 hooktftp will execute a script, issue a HTTP GET request or just reads the file
 from the filesystem.
 
-This is a fork of epeli/hooktftp server inspired by [puavo-tftp]. It's written
+This is a fork of [epeli/hooktftp] server inspired by [puavo-tftp]. It's written
 in Go in the hope of being faster and more stable.
 
 ## Usage
@@ -76,9 +74,9 @@ hooks:
     template: /var/lib/tftpboot/$0
 ```
 
-# Install
+## Install
 
-## Compiling from sources
+### Compiling from sources
 
 [Install Go][] (1.1 or later), make sure you have git and bazaar too. 
 Assuming you've successfully set up GOPATH and have GOPATH/bin on your path, simply:
@@ -90,11 +88,12 @@ Now you should have a standalone hooktftp binary on your path.
     hooktftp -h
     Usage: hooktftp [config]
 
-## Build Debian package
+### Build Debian package
 
 The package has been created with devscripts and dh-make. To build it:
 
     debuild -us -uc
 
+[epeli/hooktftp]: https://github.com/epeli/hooktftp
 [puavo-tftp]: https://github.com/opinsys/puavo-tftp
 [Install Go]: http://golang.org/doc/install
