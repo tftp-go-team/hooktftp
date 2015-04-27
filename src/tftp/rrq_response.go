@@ -7,6 +7,7 @@ import (
 	"net"
 	"strconv"
 	"time"
+	"../logger"
 )
 
 type Connection interface {
@@ -94,7 +95,7 @@ func (res *RRQresponse) writeBuffer() (int, error) {
 
 	acknum := binary.BigEndian.Uint16(res.ack[2:])
 	if acknum == res.blocknum-1 {
-		fmt.Println("Got previous ACK", acknum, "Retrying...")
+		logger.Debug("Got previous ACK %d. Retrying...", acknum)
 		res.blocknum--
 		return res.writeBuffer()
 	}

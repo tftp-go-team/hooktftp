@@ -2,5 +2,4 @@
 
 Some features to implement...
 
-  * Implements syslog (golang "log/syslog")
   * Rewrite go tests and acceptance tests with Makefile 

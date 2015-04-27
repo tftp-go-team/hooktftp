@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"net"
+	"../logger"
 )
 
 type Request struct {
@@ -69,14 +70,12 @@ func ParseRequest(data []byte) (*Request, error) {
 			blksizebytes, rest = sliceUpToNullByte(rest)
 			blocksize, err := strconv.Atoi(string(blksizebytes))
 			if err != nil {
-				fmt.Println("Failed to parse blksize", blksizebytes)
+				logger.Err("Failed to parse blksize %d", blksizebytes)
 				return request, err
 			}
 			request.Blocksize = blocksize
 		default:
-			fmt.Println("Unknown option:", option, string(option))
-			fmt.Println("data:", data)
-			fmt.Println("data string:", string(data))
+			logger.Err("Unknown option: %s; data: %s", string(option), string(data))
 			// throw away unknown option value
 			_, rest = sliceUpToNullByte(rest)
 		}

@@ -94,6 +94,14 @@ The package has been created with devscripts and dh-make. To build it:
 
     debuild -us -uc
 
+## History
+
+   * hooktftp was forked from [epeli/hooktftp] in version 0.9.0.
+   * Version upgraded to 0.9.1 after small improvement about HTTP User-Agent.
+   * Refactoring of sources tree and Debian packaging for next production version 1.0.0.
+   * Add syslog feature
+
+
 [epeli/hooktftp]: https://github.com/epeli/hooktftp
 [puavo-tftp]: https://github.com/opinsys/puavo-tftp
 [Install Go]: http://golang.org/doc/install

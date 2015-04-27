@@ -13,6 +13,8 @@ import (
 	"os/user"
 	"syscall"
 	"time"
+	"./logger"
+	"log"
 )
 
 var HOOKS []hooks.Hook
@@ -24,11 +26,12 @@ func handleRRQ(res *tftp.RRQresponse) {
 
 	path := res.Request.Path
 
-	fmt.Println(
-		"GET", path,
-		"blocksize", res.Request.Blocksize,
-		"from", *res.Request.Addr,
-	)
+	logger.Info(fmt.Sprintf(
+		"GET %s blocksize %d from %s",
+		path,
+		res.Request.Blocksize,
+		*res.Request.Addr,
+	))
 
 	var reader io.ReadCloser
 	for _, hook := range HOOKS {
@@ -43,14 +46,14 @@ func handleRRQ(res *tftp.RRQresponse) {
 				return
 			}
 
-			fmt.Printf("Failed to execute hook for '%v' error: %v", res.Request.Path, err)
-			res.WriteError(tftp.UNKNOWN_ERROR, "Hook failed: "+err.Error())
+			logger.Err("Failed to execute hook for '%v' error: %v", res.Request.Path, err)
+			res.WriteError(tftp.UNKNOWN_ERROR, "Hook failed: " + err.Error())
 			return
 		}
 		defer func() {
 			err := reader.Close()
 			if err != nil {
-				fmt.Println("Failed to close reader for", res.Request.Path, err)
+				logger.Err("Failed to close reader for %s: %s", res.Request.Path, err)
 			}
 		}()
 		break
@@ -62,7 +65,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 	}
 
 	if err := res.WriteOACK(); err != nil {
-		fmt.Println("Failed to write OACK", err)
+		logger.Err("Failed to write OACK", err)
 		return
 	}
 
@@ -76,19 +79,19 @@ func handleRRQ(res *tftp.RRQresponse) {
 
 		if err == io.EOF {
 			if _, err := res.Write(b[:bytesRead]); err != nil {
-				fmt.Println("Failed to write last bytes of the reader", err)
+				logger.Err("Failed to write last bytes of the reader: %s", err)
 				return
 			}
 			res.End()
 			break
 		} else if err != nil {
-			fmt.Println("Error while reading", reader, err)
+			logger.Err("Error while reading %s: %s", reader, err)
 			res.WriteError(tftp.UNKNOWN_ERROR, err.Error())
 			return
 		}
 
 		if _, err := res.Write(b[:bytesRead]); err != nil {
-			fmt.Println("Failed to write bytes for", path, err)
+			logger.Err("Failed to write bytes for %s: %s", path, err)
 			return
 		}
 	}
@@ -97,37 +100,41 @@ func handleRRQ(res *tftp.RRQresponse) {
 
 	speed := float64(totalBytes) / took.Seconds() / 1024 / 1024
 
-	fmt.Printf("Sent %v bytes in %v %f MB/s\n", totalBytes, took, speed)
+	logger.Info("Sent %v bytes in %v %f MB/s\n", totalBytes, took, speed)
 }
 
 func main() {
+	e := logger.Initialize("hooktftp");
+	if e != nil {
+		log.Fatal("Failed to initialize logger")
+	}
+	
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "\nUsage: %s [config]\n", os.Args[0])
-		fmt.Println("\n    See https://github.com/epeli/hooktftp\n")
-	}
+	}	
 	flag.Parse()
 
 	if len(flag.Args()) > 0 {
 		CONFIG_PATH = flag.Args()[0]
 	}
 
-	fmt.Println("Reading hooks from", CONFIG_PATH)
+	logger.Info("Reading hooks from %s", CONFIG_PATH)
 
 	configData, err := ioutil.ReadFile(CONFIG_PATH)
 
 	if err != nil {
-		fmt.Println("Failed to read config", err)
+		logger.Crit("Failed to read config: %s", err)
 		return
 	}
 
 	conf, err := config.ParseYaml(configData)
 	if err != nil {
-		fmt.Println("Failed to parse config", err)
+		logger.Crit("Failed to parse config: %s", err)
 		return
 	}
 
 	for _, hookDef := range conf.HookDefs {
-		fmt.Println("Compiling hook", hookDef)
+		logger.Notice("Compiling hook %s", hookDef)
 
 		// Create new hookDef variable for the hookDef pointer for each loop
 		// iteration. Go reuses the hookDef variable and if we pass pointer to
@@ -135,7 +142,7 @@ func main() {
 		newPointer := hookDef
 		hook, err := hooks.CompileHook(&newPointer)
 		if err != nil {
-			fmt.Println("Failed to compile hook", hookDef, err)
+			logger.Crit("Failed to compile hook %s: %s", hookDef, err)
 			return
 		}
 		HOOKS = append(HOOKS, hook)
@@ -147,38 +154,36 @@ func main() {
 
 	addr, err := net.ResolveUDPAddr("udp", ":"+conf.Port)
 	if err != nil {
-		fmt.Println("Failed to resolve address", err)
+		logger.Crit("Failed to resolve address: %s", err)
 		return
 	}
 
 	server, err := tftp.NewTFTPServer(addr)
 	if err != nil {
-		fmt.Println("Failed to listen", err)
+		logger.Crit("Failed to listen: %s", err)
 		return
 	}
 
-	fmt.Println("Listening on", conf.Port)
+	logger.Notice("Listening on %d", conf.Port)
 
 	if conf.User != "" {
 		err := DropPrivileges(conf.User)
 		if err != nil {
-			fmt.Printf("Failed to drop privileges to '%s' error: %v", conf.User, err)
+			logger.Crit("Failed to drop privileges to '%s' error: %v", conf.User, err)
 			return
 		}
 		currentUser, _ := user.Current()
-		fmt.Println("Dropped privileges to", currentUser)
+		logger.Notice("Dropped privileges to %s", currentUser)
 	}
 
 	if conf.User == "" && syscall.Getuid() == 0 {
-		fmt.Println("!!!!!!!!!")
-		fmt.Println("WARNING: Running as root and 'user' is not set in", CONFIG_PATH)
-		fmt.Println("!!!!!!!!!")
+		logger.Warning("Running as root and 'user' is not set in %s", CONFIG_PATH)
 	}
 
 	for {
 		res, err := server.Accept()
 		if err != nil {
-			fmt.Println("Bad tftp request", err)
+			logger.Err("Bad tftp request: %s", err)
 			continue
 		}
 

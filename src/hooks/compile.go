@@ -3,6 +3,7 @@ package hooks
 import (
 	"fmt"
 	"../regexptransform"
+	"../logger"
 	"io"
 )
 
@@ -55,7 +56,7 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 			return nil, err
 		}
 
-		fmt.Println("Executing hook:", hookDef, path, "->", newPath)
+		logger.Info("Executing hook: %s %s -> %s", hookDef, path, newPath)
 		reader, err := components.Execute(newPath)
 		if err != nil {
 			return nil, err

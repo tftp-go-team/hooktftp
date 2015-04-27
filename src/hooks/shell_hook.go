@@ -1,10 +1,10 @@
 package hooks
 
 import (
-	"fmt"
 	"io"
 	"os/exec"
 	"regexp"
+	"../logger"
 )
 
 // Borrowed from Ruby
@@ -28,7 +28,7 @@ var ShellHook = HookComponents{
 		go func() {
 			err := cmd.Wait()
 			if err != nil {
-				fmt.Printf("Command '%v' failed to execute: '%v'", command, err)
+				logger.Err("Command '%v' failed to execute: '%v'", command, err)
 			}
 		}()
 
