@@ -2,8 +2,10 @@ package hooks
 
 import (
 	"io"
+	"io/ioutil"
 	"os/exec"
 	"regexp"
+	"bytes"
 	"../logger"
 )
 
@@ -20,6 +22,17 @@ var ShellHook = HookComponents{
 		}
 		err = cmd.Start()
 
+		// Buffering content to avoid Reader closing after cmd.Wait()
+		// For more informations please see:
+		//    http://stackoverflow.com/questions/20134095/why-do-i-get-bad-file-descriptor-in-this-go-program-using-stderr-and-ioutil-re
+		// Note:
+		//    This is not a perfect solution because of buffering. (Memory usage...)
+		//    If you have better solution ...
+		out, err := ioutil.ReadAll(stdout)
+		if err != nil {
+			logger.Err("Shell output buffering failed: %v", err)
+		}
+
 		// Use goroutine to log the exit status for debugging purposes.
 		// XXX: It probably is bad practice to access variables from multiple
 		// goroutines, but I hope it is ok in this case since the purpose is
@@ -31,8 +44,8 @@ var ShellHook = HookComponents{
 				logger.Err("Command '%v' failed to execute: '%v'", command, err)
 			}
 		}()
-
-		return stdout, err
+		
+		return ioutil.NopCloser(bytes.NewReader(out)), err
 	},
 	func(s string) string {
 		return shellEscape.ReplaceAllStringFunc(s, func(s string) string {
