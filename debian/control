@@ -2,7 +2,7 @@ Source: hooktftp
 Section: utils
 Priority: extra
 Maintainer: Raphael Medaer <raphael.medaer@straightforward.me>
-Build-Depends: debhelper (>= 8.0.0), bzr, golang-go
+Build-Depends: debhelper (>= 8.0.0), bzr, golang-go, atftp, python
 Standards-Version: 3.9.3
 Homepage: https://github.com/rmedaer/hooktftp
 

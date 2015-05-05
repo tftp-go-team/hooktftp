@@ -1,0 +1,11 @@
+port: 4242
+hooks:
+  - type: shell
+    regexp: ^shell\/(.*)$
+    template: cat fixtures/$1
+  - type: file
+    regexp: ^files\/(.*)$
+    template: ./fixtures/$1
+  - type: http
+    regexp: ^web\/(.*)$
+    template: http://localhost:8000/fixtures/$1

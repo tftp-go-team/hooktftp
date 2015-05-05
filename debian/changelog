@@ -1,7 +1,9 @@
 hooktftp (1.0.0-beta) testing; urgency=low
 
   * Improvement: Sources tree refactoring
-  * Feature: Logging with natuve syslog
+  * Feature: Logging with native syslog
+  * Improvement: Reorganize/rewrite unit and end-to-end tests
+  * Bugfix: Buffering shell hook output
 
  -- Raphael Medaer <raphael.medaer@straightforward.me>  Tue, 28 Apr 2015 12:55:44 +0200
 
