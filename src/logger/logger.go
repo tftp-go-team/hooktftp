@@ -2,6 +2,7 @@ package logger
 
 import (
 	"fmt"
+	"os"
 	"log/syslog"
 )
 
@@ -15,35 +16,79 @@ func Initialize(tag string) error {
 	return err
 }
 
+func Close() error {
+	return instance.Close()
+}
+
 func Alert(format string, a ...interface{}) (err error) {
-	return instance.Alert(fmt.Sprintf(format, a...))
+	str := fmt.Sprintf(format, a...)
+	if instance == nil {
+		_, ferr := fmt.Fprintln(os.Stderr, str)
+		return ferr
+	}
+	return instance.Alert(str)
 }
 
 func Crit(format string, a ...interface{}) (err error) {
-	return instance.Crit(fmt.Sprintf(format, a...))
+	str := fmt.Sprintf(format, a...)
+	if instance == nil {
+		_, ferr := fmt.Fprintln(os.Stderr, str)
+		return ferr
+	}
+	return instance.Crit(str)
 }
 
 func Debug(format string, a ...interface{}) (err error) {
-	return instance.Debug(fmt.Sprintf(format, a...))
+	str := fmt.Sprintf(format, a...)
+	if instance == nil {
+		_, ferr := fmt.Fprintln(os.Stderr, str)
+		return ferr
+	}
+	return instance.Debug(str)
 }
 
 func Emerg(format string, a ...interface{}) (err error) {
-	return instance.Emerg(fmt.Sprintf(format, a...))
+	str := fmt.Sprintf(format, a...)
+	if instance == nil {
+		_, ferr := fmt.Fprintln(os.Stderr, str)
+		return ferr
+	}
+	return instance.Emerg(str)
 }
 
 func Err(format string, a ...interface{}) (err error) {
-	return instance.Err(fmt.Sprintf(format, a...))
+	str := fmt.Sprintf(format, a...)
+	if instance == nil {
+		_, ferr := fmt.Fprintln(os.Stderr, str)
+		return ferr
+	}
+	return instance.Err(str)
 }
 
 func Info(format string, a ...interface{}) (err error) {
-	return instance.Info(fmt.Sprintf(format, a...))
+	str := fmt.Sprintf(format, a...)
+	if instance == nil {
+		_, ferr := fmt.Fprintln(os.Stderr, str)
+		return ferr
+	}
+	return instance.Info(str)
 }
 
 func Notice(format string, a ...interface{}) (err error) {
-	return instance.Notice(fmt.Sprintf(format, a...))
+	str := fmt.Sprintf(format, a...)
+	if instance == nil {
+		_, ferr := fmt.Fprintln(os.Stderr, str)
+		return ferr
+	}
+	return instance.Notice(str)
 }
 
 func Warning(format string, a ...interface{}) (err error) {
-	return instance.Warning(fmt.Sprintf(format, a...))
+	str := fmt.Sprintf(format, a...)
+	if instance == nil {
+		_, ferr := fmt.Fprintln(os.Stderr, str)
+		return ferr
+	}
+	return instance.Warning(str)
 }
 

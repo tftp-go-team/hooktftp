@@ -104,15 +104,19 @@ func handleRRQ(res *tftp.RRQresponse) {
 }
 
 func main() {
-	e := logger.Initialize("hooktftp");
-	if e != nil {
-		log.Fatal("Failed to initialize logger")
-	}
 	
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "\nUsage: %s [config]\n", os.Args[0])
-	}	
+	}
+	verbose := flag.Bool("v", false, "a bool")
 	flag.Parse()
+
+	if ! *verbose {
+		e := logger.Initialize("hooktftp");
+		if e != nil {
+			log.Fatal("Failed to initialize logger")
+		}
+	}
 
 	if len(flag.Args()) > 0 {
 		CONFIG_PATH = flag.Args()[0]
@@ -189,5 +193,7 @@ func main() {
 
 		go handleRRQ(res)
 	}
+
+	logger.Close()
 
 }
