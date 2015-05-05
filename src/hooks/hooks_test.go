@@ -2,10 +2,11 @@ package hooks
 
 import (
 	"fmt"
-	"../config"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"config"
+	"io/ioutil"
 )
 
 type hookTestCase struct {
@@ -28,6 +29,7 @@ func TestHooks(t *testing.T) {
 		}
 
 		if r.URL.String() == "/test/web.txt" {
+			w.WriteHeader(200)
 			fmt.Fprintln(w, "RES:web.txt")
 			return
 		}
@@ -174,8 +176,7 @@ func TestHooks(t *testing.T) {
 			return
 		}
 
-		data := make([]byte, 20)
-		_, err = file.Read(data)
+		data, err := ioutil.ReadAll(file)
 		if err != nil {
 			t.Error("Failed to read file", testCase.hookDef, file)
 			return
