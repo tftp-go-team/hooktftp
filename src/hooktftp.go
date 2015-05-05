@@ -3,9 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"./config"
-	"./hooks"
-	"./tftp"
 	"io"
 	"io/ioutil"
 	"net"
@@ -13,8 +10,11 @@ import (
 	"os/user"
 	"syscall"
 	"time"
-	"./logger"
 	"log"
+	"logger"
+	"config"
+	"tftp"
+	"hooks"
 )
 
 var HOOKS []hooks.Hook

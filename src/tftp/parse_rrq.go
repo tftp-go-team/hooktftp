@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"net"
-	"../logger"
+	"logger"
 )
 
 type Request struct {

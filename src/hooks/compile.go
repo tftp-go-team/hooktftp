@@ -2,8 +2,8 @@ package hooks
 
 import (
 	"fmt"
-	"../regexptransform"
-	"../logger"
+	"regexptransform"
+	"logger"
 	"io"
 )
 

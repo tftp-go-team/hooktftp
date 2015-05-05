@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"regexp"
 	"bytes"
-	"../logger"
+	"logger"
 )
 
 // Borrowed from Ruby

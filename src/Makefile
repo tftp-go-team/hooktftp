@@ -7,8 +7,7 @@ hooktftp: tftp/parse_rrq.go tftp/rrq_response.go tftp/server.go tftp/rrq_test.go
 
 .PHONY: deps
 deps:
-	go get
-
+	go get -v .../.
 
 .PHONY: test
 test: test_regexptransform test_tftp test_config test_hooks

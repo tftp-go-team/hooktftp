@@ -7,7 +7,7 @@ import (
 	"net"
 	"strconv"
 	"time"
-	"../logger"
+	"logger"
 )
 
 type Connection interface {
