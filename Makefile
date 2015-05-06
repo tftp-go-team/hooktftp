@@ -1,8 +1,4 @@
 
-.PHONY: all
-all: build test
-
-
 .PHONY: build
 build:
 	$(MAKE) -C src

@@ -11,9 +11,10 @@ in Go in the hope of being faster and more stable.
 
 ## Usage
 
-    hooktftp [config]
+    hooktftp [-v] [config]
 
-Config will be read from `/etc/hooktftp.yml` by default.
+Config will be read from `/etc/hooktftp.yml` by default. Verbose option `-v`
+print log to stderr insteadof syslog.
 
 ## Configuration
 
@@ -86,20 +87,23 @@ Assuming you've successfully set up GOPATH and have GOPATH/bin on your path, sim
 Now you should have a standalone hooktftp binary on your path.
 
     hooktftp -h
-    Usage: hooktftp [config]
+    Usage: hooktftp [-v] [config]
 
 ### Build Debian package
 
 The package has been created with devscripts and dh-make. To build it:
 
-    debuild -us -uc
+    debuild -e GOPATH=$PWD -us -uc
 
 ## History
 
-   * hooktftp was forked from [epeli/hooktftp] in version 0.9.0.
-   * Version upgraded to 0.9.1 after small improvement about HTTP User-Agent.
-   * Refactoring of sources tree and Debian packaging for next production version 1.0.0.
-   * Add syslog feature
+Please read debian changelog file.
+
+## Tests
+
+You can start unit and end-to-end test with Makefile target `test`:
+
+    make test
 
 
 [epeli/hooktftp]: https://github.com/epeli/hooktftp

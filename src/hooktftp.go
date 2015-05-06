@@ -106,7 +106,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 func main() {
 	
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "\nUsage: %s [config]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "\nUsage: %s [-v] [config]\n", os.Args[0])
 	}
 	verbose := flag.Bool("v", false, "a bool")
 	flag.Parse()

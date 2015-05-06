@@ -1,9 +1,11 @@
-hooktftp (1.0.0-beta) testing; urgency=low
+hooktftp (1.0.0) testing; urgency=low
 
   * Improvement: Sources tree refactoring
+  * Improvement: Fix GO path and packages
   * Feature: Logging with native syslog
   * Improvement: Reorganize/rewrite unit and end-to-end tests
   * Bugfix: Buffering shell hook output
+  * Bugfix: Fix io.reader EOF in hook unit tests
 
  -- Raphael Medaer <raphael.medaer@straightforward.me>  Tue, 28 Apr 2015 12:55:44 +0200
 
