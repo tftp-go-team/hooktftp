@@ -31,6 +31,7 @@ func newRRQResonponse() (*RRQresponse, *MockConnection) {
 		RRQ,
 		5,
 		OCTET,
+		-1,
 		"/foo",
 		nil,
 	}
@@ -42,6 +43,7 @@ func newRRQResonponse() (*RRQresponse, *MockConnection) {
 		request,
 		0,
 		false,
+		-1,
 	}
 	return rrq, conn
 }

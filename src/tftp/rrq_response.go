@@ -7,6 +7,7 @@ import (
 	"net"
 	"strconv"
 	"time"
+
 	"logger"
 )
 
@@ -16,13 +17,14 @@ type Connection interface {
 }
 
 type RRQresponse struct {
-	conn        Connection
-	buffer      []byte
-	pos         int
-	ack         []byte
-	Request     *Request
-	blocknum    uint16
-	badinternet bool
+	conn         Connection
+	buffer       []byte
+	pos          int
+	ack          []byte
+	Request      *Request
+	blocknum     uint16
+	badinternet  bool
+	TransferSize int
 }
 
 func (res *RRQresponse) SimulateBadInternet() bool {
@@ -139,6 +141,13 @@ func (res *RRQresponse) WriteOACK() error {
 	oackbuffer = append(oackbuffer, []byte(strconv.Itoa(res.Request.Blocksize))...)
 	oackbuffer = append(oackbuffer, 0)
 
+	if res.TransferSize != -1 {
+		oackbuffer = append(oackbuffer, []byte("tsize")...)
+		oackbuffer = append(oackbuffer, 0)
+		oackbuffer = append(oackbuffer, []byte(strconv.Itoa(res.TransferSize))...)
+		oackbuffer = append(oackbuffer, 0)
+	}
+
 	_, err := res.conn.Write(oackbuffer)
 	if err != nil {
 		return err
@@ -181,6 +190,7 @@ func NewRRQresponse(clientaddr *net.UDPAddr, request *Request, badinternet bool)
 		request,
 		0,
 		badinternet,
+		-1,
 	}, nil
 
 }
