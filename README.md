@@ -6,8 +6,8 @@ the file system. Hooks are matched with regular expressions and on match
 hooktftp will execute a script, issue a HTTP GET request or just reads the file
 from the filesystem.
 
-This is a fork of [epeli/hooktftp] server inspired by [puavo-tftp]. It's written
-in Go in the hope of being faster and more stable.
+This is inspired by [puavo-tftp]. It's written in Go in the hope of being faster
+and more stable.
 
 ## Usage
 
