@@ -3,17 +3,19 @@ package tftp
 import (
 	"encoding/binary"
 	"fmt"
-	"strconv"
 	"net"
+	"strconv"
+
 	"logger"
 )
 
 type Request struct {
-	Opcode    uint16
-	Blocksize int
-	Mode      int
-	Path      string
-	Addr      *net.Addr
+	Opcode       uint16
+	Blocksize    int
+	TransferSize int
+	Mode         int
+	Path         string
+	Addr         *net.Addr
 }
 
 type RRQParseError struct {
@@ -74,6 +76,15 @@ func ParseRequest(data []byte) (*Request, error) {
 				return request, err
 			}
 			request.Blocksize = blocksize
+		case "tsize":
+			var tsizebytes []byte
+			tsizebytes, rest = sliceUpToNullByte(rest)
+			tsize, err := strconv.Atoi(string(tsizebytes))
+			if err != nil {
+				logger.Err("Failed to parse tsize %s", tsizebytes)
+				return request, err
+			}
+			request.TransferSize = tsize
 		default:
 			logger.Err("Unknown option: %s; data: %s", string(option), string(data))
 			// throw away unknown option value
