@@ -13,7 +13,7 @@ import (
 	"log"
 	"logger"
 	"config"
-	"tftp"
+	"github.com/tftp-go-team/libgotftp/src"
 	"hooks"
 )
 
