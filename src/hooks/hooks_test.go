@@ -162,7 +162,7 @@ func TestHooks(t *testing.T) {
 			return
 		}
 
-		file, err := hook(testCase.input)
+		file, _, err := hook(testCase.input)
 		if err == NO_MATCH {
 			t.Error(testCase.hookDef.Regexp, "does not match with", testCase.input)
 		}
