@@ -156,7 +156,7 @@ func main() {
 		conf.Port = "69"
 	}
 
-	addr, err := net.ResolveUDPAddr("udp", ":"+conf.Port)
+	addr, err := net.ResolveUDPAddr("udp", conf.Host+":"+conf.Port)
 	if err != nil {
 		logger.Crit("Failed to resolve address: %s", err)
 		return
@@ -168,7 +168,7 @@ func main() {
 		return
 	}
 
-	logger.Notice("Listening on %d", conf.Port)
+	logger.Notice("Listening on %s:%d", conf.Host, conf.Port)
 
 	if conf.User != "" {
 		err := DropPrivileges(conf.User)
