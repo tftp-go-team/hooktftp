@@ -9,12 +9,18 @@ import (
 var pathEscape = regexp.MustCompile("\\.\\.\\/")
 
 var FileHook = HookComponents{
-	func(path string) (io.ReadCloser, error) {
+	func(path string) (io.ReadCloser, int, error) {
 		file, err := os.Open(path)
 		if err != nil {
-			return nil, err
+			return nil, -1, err
 		}
-		return file, nil
+
+		// get the file size
+		stat, err := file.Stat()
+		if err != nil {
+			return nil, -1, err
+		}
+		return file, int(stat.Size()), nil
 	},
 	func(s string) string {
 		return pathEscape.ReplaceAllLiteralString(s, "")

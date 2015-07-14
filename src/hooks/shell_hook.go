@@ -1,12 +1,12 @@
 package hooks
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
+	"logger"
 	"os/exec"
 	"regexp"
-	"bytes"
-	"logger"
 )
 
 // Borrowed from Ruby
@@ -14,11 +14,11 @@ import (
 var shellEscape = regexp.MustCompile("([^A-Za-z0-9_\\-.,:\\/@\n])")
 
 var ShellHook = HookComponents{
-	func(command string) (io.ReadCloser, error) {
+	func(command string) (io.ReadCloser, int, error) {
 		cmd := exec.Command("sh", "-c", command)
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
-			return nil, err
+			return nil, -1, err
 		}
 		err = cmd.Start()
 
@@ -44,8 +44,8 @@ var ShellHook = HookComponents{
 				logger.Err("Command '%v' failed to execute: '%v'", command, err)
 			}
 		}()
-		
-		return ioutil.NopCloser(bytes.NewReader(out)), err
+
+		return ioutil.NopCloser(bytes.NewReader(out)), -1, err
 	},
 	func(s string) string {
 		return shellEscape.ReplaceAllStringFunc(s, func(s string) string {

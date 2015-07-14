@@ -10,7 +10,7 @@ import (
 var NO_MATCH = regexptransform.NO_MATCH
 
 type HookComponents struct {
-	Execute func(string) (io.ReadCloser, error)
+	Execute func(string) (io.ReadCloser, int, error)
 	escape  regexptransform.Escape
 }
 
@@ -21,7 +21,7 @@ type iHookDef interface {
 	GetTemplate() string
 }
 
-type Hook func(string) (io.ReadCloser, error)
+type Hook func(string) (io.ReadCloser, int, error)
 
 var hookMap = map[string]HookComponents{
 	"file":  FileHook,
@@ -50,17 +50,17 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 		return nil, err
 	}
 
-	return func(path string) (io.ReadCloser, error) {
+	return func(path string) (io.ReadCloser, int, error) {
 		newPath, err := transform(path)
 		if err != nil {
-			return nil, err
+			return nil, -1, err
 		}
 
 		logger.Info("Executing hook: %s %s -> %s", hookDef, path, newPath)
-		reader, err := components.Execute(newPath)
+		reader, len, err := components.Execute(newPath)
 		if err != nil {
-			return nil, err
+			return nil, len, err
 		}
-		return reader, nil
+		return reader, len, nil
 	}, nil
 }

@@ -1,20 +1,20 @@
 package main
 
 import (
+	"config"
 	"flag"
 	"fmt"
+	"github.com/tftp-go-team/libgotftp/src"
+	"hooks"
 	"io"
 	"io/ioutil"
+	"log"
+	"logger"
 	"net"
 	"os"
 	"os/user"
 	"syscall"
 	"time"
-	"log"
-	"logger"
-	"config"
-	"github.com/tftp-go-team/libgotftp/src"
-	"hooks"
 )
 
 var HOOKS []hooks.Hook
@@ -34,9 +34,10 @@ func handleRRQ(res *tftp.RRQresponse) {
 	))
 
 	var reader io.ReadCloser
+	var len int
 	for _, hook := range HOOKS {
 		var err error
-		reader, err = hook(res.Request.Path)
+		reader, len, err = hook(res.Request.Path)
 		if err == hooks.NO_MATCH {
 			continue
 		} else if err != nil {
@@ -47,7 +48,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 			}
 
 			logger.Err("Failed to execute hook for '%v' error: %v", res.Request.Path, err)
-			res.WriteError(tftp.UNKNOWN_ERROR, "Hook failed: " + err.Error())
+			res.WriteError(tftp.UNKNOWN_ERROR, "Hook failed: "+err.Error())
 			return
 		}
 		defer func() {
@@ -62,6 +63,10 @@ func handleRRQ(res *tftp.RRQresponse) {
 	if reader == nil {
 		res.WriteError(tftp.NOT_FOUND, "No hook matches")
 		return
+	}
+
+	if res.Request.TransferSize != -1 {
+		res.TransferSize = len
 	}
 
 	if err := res.WriteOACK(); err != nil {
@@ -104,15 +109,15 @@ func handleRRQ(res *tftp.RRQresponse) {
 }
 
 func main() {
-	
+
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "\nUsage: %s [-v] [config]\n", os.Args[0])
 	}
 	verbose := flag.Bool("v", false, "a bool")
 	flag.Parse()
 
-	if ! *verbose {
-		e := logger.Initialize("hooktftp");
+	if !*verbose {
+		e := logger.Initialize("hooktftp")
 		if e != nil {
 			log.Fatal("Failed to initialize logger")
 		}
