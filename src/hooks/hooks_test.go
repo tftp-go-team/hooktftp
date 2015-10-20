@@ -2,11 +2,12 @@ package hooks
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"config"
-	"io/ioutil"
+
+	"github.com/tftp-go-team/hooktftp/src/config"
 )
 
 type hookTestCase struct {

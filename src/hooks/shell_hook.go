@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
-	"logger"
 	"os/exec"
 	"regexp"
+
+	"github.com/tftp-go-team/hooktftp/src/logger"
 )
 
 // Borrowed from Ruby

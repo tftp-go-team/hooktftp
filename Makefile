@@ -1,4 +1,3 @@
-
 .PHONY: build
 build:
 	$(MAKE) -C src
@@ -6,10 +5,9 @@ build:
 .PHONY: test
 test: build
 	$(MAKE) -C src test
-	$(MAKE) -C test all 
+	$(MAKE) -C test all
 
 .PHONY: clean
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C test clean
-

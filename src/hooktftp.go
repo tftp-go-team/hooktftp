@@ -1,20 +1,21 @@
 package main
 
 import (
-	"config"
 	"flag"
 	"fmt"
-	"github.com/tftp-go-team/libgotftp/src"
-	"hooks"
 	"io"
 	"io/ioutil"
 	"log"
-	"logger"
 	"net"
 	"os"
 	"os/user"
 	"syscall"
 	"time"
+
+	"github.com/tftp-go-team/hooktftp/src/config"
+	"github.com/tftp-go-team/hooktftp/src/hooks"
+	"github.com/tftp-go-team/hooktftp/src/logger"
+	"github.com/tftp-go-team/libgotftp/src"
 )
 
 var HOOKS []hooks.Hook

@@ -2,9 +2,10 @@ package hooks
 
 import (
 	"fmt"
-	"regexptransform"
-	"logger"
 	"io"
+
+	"github.com/tftp-go-team/hooktftp/src/logger"
+	"github.com/tftp-go-team/hooktftp/src/regexptransform"
 )
 
 var NO_MATCH = regexptransform.NO_MATCH

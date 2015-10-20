@@ -1,8 +1,14 @@
+sudo: required
+
 language: go
-install:
-  - sudo apt-get install -y atftp python
+
 before_script:
-  - export GOPATH=$PWD
-script: make test
+  - sudo apt-get update -qq
+  - sudo apt-get install -q -y atftp python
+
+script:
+  - make build
+  - make test
+
 go:
-  - 1.1
+  - 1.5
