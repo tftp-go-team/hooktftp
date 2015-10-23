@@ -20,7 +20,7 @@ import (
 var shellEscape = regexp.MustCompile("([^A-Za-z0-9_\\-.,:\\/@\n])")
 
 var ShellHook = HookComponents{
-	func(command string, _ tftp.Request) (io.ReadCloser, int, error) {
+	func(command string, request tftp.Request) (io.ReadCloser, int, error) {
 
 		if len(command) == 0 {
 			return nil, -1, errors.New("Empty shell command")
@@ -32,10 +32,16 @@ var ShellHook = HookComponents{
 		}
 
 		cmd := exec.Command(split[0], split[1:]...)
+
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
 			return nil, -1, err
 		}
+
+		env := os.Environ()
+		env = append(env, fmt.Sprintf("CLIENT_ADDR=%s", (*request.Addr).String()))
+		cmd.Env = env
+
 		err = cmd.Start()
 
 		// Buffering content to avoid Reader closing after cmd.Wait()

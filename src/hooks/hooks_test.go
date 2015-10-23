@@ -3,6 +3,7 @@ package hooks
 import (
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -164,7 +165,12 @@ func TestHooks(t *testing.T) {
 			return
 		}
 
-		fakeRequest := tftp.Request{}
+		addr := net.Addr(&net.TCPAddr{
+			IP:   net.ParseIP("198.51.100.13"),
+			Port: 63233,
+		})
+		fakeRequest := tftp.Request{Addr: &addr}
+
 		file, _, err := hook(testCase.input, fakeRequest)
 		if err == NO_MATCH {
 			t.Error(testCase.hookDef.Regexp, "does not match with", testCase.input)
