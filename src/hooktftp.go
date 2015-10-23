@@ -74,11 +74,12 @@ func handleRRQ(res *tftp.RRQresponse) {
 			b := make([]byte, 4096)
 
 			for ; err != io.EOF; bytesRead, err = errReader.Read(b) {
+				if bytesRead > 0 {
+					logger.Warning("Hook error: %s", b[:bytesRead])
+				}
 				if err != nil {
 					logger.Err("Error while reading error reader: %s", err)
 					return
-				} else if bytesRead > 0 {
-					logger.Warning("Hook error: %s", b[:bytesRead])
 				}
 			}
 		}()
