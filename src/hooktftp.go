@@ -34,11 +34,11 @@ func handleRRQ(res *tftp.RRQresponse) {
 		*res.Request.Addr,
 	))
 
-	var outReader io.ReadCloser
+	var outReader, errReader io.ReadCloser
 	var len int
 	for _, hook := range HOOKS {
 		var err error
-		outReader, _, len, err = hook(res.Request.Path, *res.Request)
+		outReader, errReader, len, err = hook(res.Request.Path, *res.Request)
 		if err == hooks.NO_MATCH {
 			continue
 		} else if err != nil {
@@ -59,6 +59,31 @@ func handleRRQ(res *tftp.RRQresponse) {
 			}
 		}()
 		break
+	}
+
+	if errReader != nil {
+		go func() {
+			defer func() {
+				if err := errReader.Close(); err != nil {
+					logger.Err("Failed to close error reader for %s: %s", res.Request.Path, err)
+				}
+			}()
+
+			b := make([]byte, 4096)
+
+			var bytesRead int
+			var err error
+			for ; err != io.EOF; bytesRead, err = errReader.Read(b) {
+
+				if err != nil {
+					logger.Err("Error while reading error reader: %s", err)
+					return
+				} else {
+					logger.Warning("Hook error: %s", b[:bytesRead])
+				}
+
+			}
+		}()
 	}
 
 	if outReader == nil {
