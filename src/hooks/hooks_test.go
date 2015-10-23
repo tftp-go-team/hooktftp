@@ -40,6 +40,11 @@ func TestHooks(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	clientAddr := net.Addr(&net.TCPAddr{
+		IP:   net.ParseIP("198.51.100.13"),
+		Port: 63233,
+	})
+
 	var hookTestCases = []hookTestCase{
 		{
 			&config.HookDef{
@@ -133,6 +138,16 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
+				Type:     "shell",
+				Regexp:   ".*",
+				Template: "sh -c 'echo $CLIENT_ADDR'",
+			},
+			"anything",
+			clientAddr.String(),
+			noError,
+		},
+		{
+			&config.HookDef{
 				Type:     "http",
 				Regexp:   "url\\/(.+)$",
 				Template: ts.URL + "/test/$1",
@@ -165,11 +180,7 @@ func TestHooks(t *testing.T) {
 			return
 		}
 
-		addr := net.Addr(&net.TCPAddr{
-			IP:   net.ParseIP("198.51.100.13"),
-			Port: 63233,
-		})
-		fakeRequest := tftp.Request{Addr: &addr}
+		fakeRequest := tftp.Request{Addr: &clientAddr}
 
 		file, _, err := hook(testCase.input, fakeRequest)
 		if err == NO_MATCH {
