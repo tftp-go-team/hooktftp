@@ -38,6 +38,11 @@ var ShellHook = HookComponents{
 			return nil, nil, -1, err
 		}
 
+		stderr, err := cmd.StderrPipe()
+		if err != nil {
+			return nil, nil, -1, err
+		}
+
 		env := os.Environ()
 		env = append(env, fmt.Sprintf("CLIENT_ADDR=%s", (*request.Addr).String()))
 		cmd.Env = env
@@ -50,9 +55,14 @@ var ShellHook = HookComponents{
 		// Note:
 		//    This is not a perfect solution because of buffering. (Memory usage...)
 		//    If you have better solution ...
-		out, err := ioutil.ReadAll(stdout)
+		outOutput, err := ioutil.ReadAll(stdout)
 		if err != nil {
 			logger.Err("Shell output buffering failed: %v", err)
+		}
+
+		errOutput, err := ioutil.ReadAll(stderr)
+		if err != nil {
+			logger.Err("Shell stderr output buffering failed: %v", err)
 		}
 
 		// Use goroutine to log the exit status for debugging purposes.
@@ -67,7 +77,7 @@ var ShellHook = HookComponents{
 			}
 		}()
 
-		return ioutil.NopCloser(bytes.NewReader(out)), nil, -1, err
+		return ioutil.NopCloser(bytes.NewReader(outOutput)), ioutil.NopCloser(bytes.NewReader(errOutput)), -1, err
 	},
 	func(s string) string {
 		return shellEscape.ReplaceAllStringFunc(s, func(s string) string {
