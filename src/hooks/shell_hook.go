@@ -2,11 +2,13 @@ package hooks
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"io/ioutil"
 	"os/exec"
 	"regexp"
 
+	"github.com/google/shlex"
 	"github.com/tftp-go-team/hooktftp/src/logger"
 )
 
@@ -16,7 +18,17 @@ var shellEscape = regexp.MustCompile("([^A-Za-z0-9_\\-.,:\\/@\n])")
 
 var ShellHook = HookComponents{
 	func(command string) (io.ReadCloser, int, error) {
-		cmd := exec.Command("sh", "-c", command)
+
+		if len(command) == 0 {
+			return nil, -1, errors.New("Empty shell command")
+		}
+
+		split, err := shlex.Split(command)
+		if err != nil {
+			return nil, -1, err
+		}
+
+		cmd := exec.Command(split[0], split[1:]...)
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
 			return nil, -1, err
