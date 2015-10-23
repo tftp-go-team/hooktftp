@@ -148,6 +148,21 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
+				Type:     "shell",
+				Regexp:   ".*",
+				Template: "",
+			},
+			"anything",
+			"anything",
+			func(err error) error {
+				if err == nil {
+					return fmt.Errorf("Bad url response test failed: Expected to have an error")
+				}
+				return nil
+			},
+		},
+		{
+			&config.HookDef{
 				Type:     "http",
 				Regexp:   "url\\/(.+)$",
 				Template: ts.URL + "/test/$1",
