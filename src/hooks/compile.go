@@ -59,10 +59,10 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 		}
 
 		logger.Info("Executing hook: %s %s -> %s", hookDef, path, newPath)
-		outReader, errReader, len, err := components.Execute(newPath, request)
+		outReader, errReader, length, err := components.Execute(newPath, request)
 		if err != nil {
-			return nil, nil, len, err
+			return nil, nil, length, err
 		}
-		return outReader, errReader, len, nil
+		return outReader, errReader, length, nil
 	}, nil
 }

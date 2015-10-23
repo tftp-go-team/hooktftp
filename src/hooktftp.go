@@ -35,10 +35,10 @@ func handleRRQ(res *tftp.RRQresponse) {
 	))
 
 	var outReader, errReader io.ReadCloser
-	var len int
+	var length int
 	for _, hook := range HOOKS {
 		var err error
-		outReader, errReader, len, err = hook(res.Request.Path, *res.Request)
+		outReader, errReader, length, err = hook(res.Request.Path, *res.Request)
 		if err == hooks.NO_MATCH {
 			continue
 		} else if err != nil {
@@ -91,7 +91,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 	}
 
 	if res.Request.TransferSize != -1 {
-		res.TransferSize = len
+		res.TransferSize = length
 	}
 
 	if err := res.WriteOACK(); err != nil {
