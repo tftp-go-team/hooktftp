@@ -3,13 +3,16 @@ package hooks
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"regexp"
 
 	"github.com/google/shlex"
 	"github.com/tftp-go-team/hooktftp/src/logger"
+	"github.com/tftp-go-team/libgotftp/src"
 )
 
 // Borrowed from Ruby
@@ -17,7 +20,7 @@ import (
 var shellEscape = regexp.MustCompile("([^A-Za-z0-9_\\-.,:\\/@\n])")
 
 var ShellHook = HookComponents{
-	func(command string) (io.ReadCloser, int, error) {
+	func(command string, _ tftp.Request) (io.ReadCloser, int, error) {
 
 		if len(command) == 0 {
 			return nil, -1, errors.New("Empty shell command")

@@ -38,7 +38,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 	var len int
 	for _, hook := range HOOKS {
 		var err error
-		reader, len, err = hook(res.Request.Path)
+		reader, len, err = hook(res.Request.Path, *res.Request)
 		if err == hooks.NO_MATCH {
 			continue
 		} else if err != nil {

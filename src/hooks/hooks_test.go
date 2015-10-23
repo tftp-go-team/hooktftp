@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/tftp-go-team/hooktftp/src/config"
+	"github.com/tftp-go-team/libgotftp/src"
 )
 
 type hookTestCase struct {
@@ -163,7 +164,8 @@ func TestHooks(t *testing.T) {
 			return
 		}
 
-		file, _, err := hook(testCase.input)
+		fakeRequest := tftp.Request{}
+		file, _, err := hook(testCase.input, fakeRequest)
 		if err == NO_MATCH {
 			t.Error(testCase.hookDef.Regexp, "does not match with", testCase.input)
 		}

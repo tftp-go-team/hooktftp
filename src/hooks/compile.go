@@ -6,12 +6,13 @@ import (
 
 	"github.com/tftp-go-team/hooktftp/src/logger"
 	"github.com/tftp-go-team/hooktftp/src/regexptransform"
+	"github.com/tftp-go-team/libgotftp/src"
 )
 
 var NO_MATCH = regexptransform.NO_MATCH
 
 type HookComponents struct {
-	Execute func(string) (io.ReadCloser, int, error)
+	Execute func(string, tftp.Request) (io.ReadCloser, int, error)
 	escape  regexptransform.Escape
 }
 
@@ -22,7 +23,7 @@ type iHookDef interface {
 	GetTemplate() string
 }
 
-type Hook func(string) (io.ReadCloser, int, error)
+type Hook func(string, tftp.Request) (io.ReadCloser, int, error)
 
 var hookMap = map[string]HookComponents{
 	"file":  FileHook,
@@ -51,14 +52,14 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 		return nil, err
 	}
 
-	return func(path string) (io.ReadCloser, int, error) {
+	return func(path string, request tftp.Request) (io.ReadCloser, int, error) {
 		newPath, err := transform(path)
 		if err != nil {
 			return nil, -1, err
 		}
 
 		logger.Info("Executing hook: %s %s -> %s", hookDef, path, newPath)
-		reader, len, err := components.Execute(newPath)
+		reader, len, err := components.Execute(newPath, request)
 		if err != nil {
 			return nil, len, err
 		}

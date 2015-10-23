@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/tftp-go-team/libgotftp/src"
 )
 
 var HTTPHook = HookComponents{
-	func(url string) (io.ReadCloser, int, error) {
+	func(url string, _ tftp.Request) (io.ReadCloser, int, error) {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				if len(via) == 0 {

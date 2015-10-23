@@ -4,12 +4,14 @@ import (
 	"io"
 	"os"
 	"regexp"
+
+	"github.com/tftp-go-team/libgotftp/src"
 )
 
 var pathEscape = regexp.MustCompile("\\.\\.\\/")
 
 var FileHook = HookComponents{
-	func(path string) (io.ReadCloser, int, error) {
+	func(path string, _ tftp.Request) (io.ReadCloser, int, error) {
 		file, err := os.Open(path)
 		if err != nil {
 			return nil, -1, err
