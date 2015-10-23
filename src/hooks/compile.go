@@ -11,8 +11,10 @@ import (
 
 var NO_MATCH = regexptransform.NO_MATCH
 
+type Hook func(string, tftp.Request) (io.ReadCloser, io.ReadCloser, int, error)
+
 type HookComponents struct {
-	Execute func(string, tftp.Request) (io.ReadCloser, io.ReadCloser, int, error)
+	Execute Hook
 	escape  regexptransform.Escape
 }
 
@@ -22,8 +24,6 @@ type iHookDef interface {
 	GetRegexp() string
 	GetTemplate() string
 }
-
-type Hook func(string, tftp.Request) (io.ReadCloser, io.ReadCloser, int, error)
 
 var hookMap = map[string]HookComponents{
 	"file":  FileHook,
