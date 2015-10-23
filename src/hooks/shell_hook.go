@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -20,27 +19,27 @@ import (
 var shellEscape = regexp.MustCompile("([^A-Za-z0-9_\\-.,:\\/@\n])")
 
 var ShellHook = HookComponents{
-	func(command string, request tftp.Request) (io.ReadCloser, io.ReadCloser, int, error) {
+	func(command string, request tftp.Request) (*HookResult, error) {
 
 		if len(command) == 0 {
-			return nil, nil, -1, errors.New("Empty shell command")
+			return nil, errors.New("Empty shell command")
 		}
 
 		split, err := shlex.Split(command)
 		if err != nil {
-			return nil, nil, -1, err
+			return nil, err
 		}
 
 		cmd := exec.Command(split[0], split[1:]...)
 
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
-			return nil, nil, -1, err
+			return nil, err
 		}
 
 		stderr, err := cmd.StderrPipe()
 		if err != nil {
-			return nil, nil, -1, err
+			return nil, err
 		}
 
 		env := os.Environ()
@@ -77,7 +76,12 @@ var ShellHook = HookComponents{
 			}
 		}()
 
-		return ioutil.NopCloser(bytes.NewReader(outOutput)), ioutil.NopCloser(bytes.NewReader(errOutput)), -1, err
+		return &HookResult{
+			Stdout: ioutil.NopCloser(bytes.NewReader(outOutput)),
+			Stderr: ioutil.NopCloser(bytes.NewReader(errOutput)),
+			Length: -1,
+		}, err
+
 	},
 	func(s string) string {
 		return shellEscape.ReplaceAllStringFunc(s, func(s string) string {

@@ -197,7 +197,7 @@ func TestHooks(t *testing.T) {
 
 		fakeRequest := tftp.Request{Addr: &clientAddr}
 
-		file, _, _, err := hook(testCase.input, fakeRequest)
+		hookResult, err := hook(testCase.input, fakeRequest)
 		if err == NO_MATCH {
 			t.Error(testCase.hookDef.Regexp, "does not match with", testCase.input)
 		}
@@ -207,13 +207,13 @@ func TestHooks(t *testing.T) {
 			return
 		}
 
-		if file == nil {
+		if hookResult == nil {
 			return
 		}
 
-		data, err := ioutil.ReadAll(file)
+		data, err := ioutil.ReadAll(hookResult.Stdout)
 		if err != nil {
-			t.Error("Failed to read file", testCase.hookDef, file)
+			t.Error("Failed to read file", testCase.hookDef, hookResult.Stdout)
 			return
 		}
 

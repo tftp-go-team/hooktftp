@@ -11,7 +11,13 @@ import (
 
 var NO_MATCH = regexptransform.NO_MATCH
 
-type Hook func(string, tftp.Request) (io.ReadCloser, io.ReadCloser, int, error)
+type HookResult struct {
+	Stdout io.ReadCloser
+	Stderr io.ReadCloser
+	Length int
+}
+
+type Hook func(path string, request tftp.Request) (*HookResult, error)
 
 type HookComponents struct {
 	Execute Hook
@@ -52,17 +58,13 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 		return nil, err
 	}
 
-	return func(path string, request tftp.Request) (io.ReadCloser, io.ReadCloser, int, error) {
+	return func(path string, request tftp.Request) (*HookResult, error) {
 		newPath, err := transform(path)
 		if err != nil {
-			return nil, nil, -1, err
+			return nil, err
 		}
 
 		logger.Info("Executing hook: %s %s -> %s", hookDef, path, newPath)
-		outReader, errReader, length, err := components.Execute(newPath, request)
-		if err != nil {
-			return nil, nil, length, err
-		}
-		return outReader, errReader, length, nil
+		return components.Execute(newPath, request)
 	}, nil
 }

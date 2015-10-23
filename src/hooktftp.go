@@ -34,11 +34,13 @@ func handleRRQ(res *tftp.RRQresponse) {
 		*res.Request.Addr,
 	))
 
-	var outReader, errReader io.ReadCloser
-	var length int
+	var hookResult *hooks.HookResult
+
 	for _, hook := range HOOKS {
+
 		var err error
-		outReader, errReader, length, err = hook(res.Request.Path, *res.Request)
+
+		hookResult, err = hook(res.Request.Path, *res.Request)
 		if err == hooks.NO_MATCH {
 			continue
 		} else if err != nil {
@@ -53,7 +55,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 			return
 		}
 		defer func() {
-			err := outReader.Close()
+			err := hookResult.Stdout.Close()
 			if err != nil {
 				logger.Err("Failed to close reader for %s: %s", res.Request.Path, err)
 			}
@@ -61,10 +63,15 @@ func handleRRQ(res *tftp.RRQresponse) {
 		break
 	}
 
-	if errReader != nil {
+	if hookResult == nil {
+		res.WriteError(tftp.NOT_FOUND, "No hook matches")
+		return
+	}
+
+	if hookResult.Stderr != nil {
 		go func() {
 			defer func() {
-				if err := errReader.Close(); err != nil {
+				if err := hookResult.Stderr.Close(); err != nil {
 					logger.Err("Failed to close error reader for %s: %s", res.Request.Path, err)
 				}
 			}()
@@ -73,7 +80,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 			var err error
 			b := make([]byte, 4096)
 
-			for ; err != io.EOF; bytesRead, err = errReader.Read(b) {
+			for ; err != io.EOF; bytesRead, err = hookResult.Stderr.Read(b) {
 				if bytesRead > 0 {
 					logger.Warning("Hook error: %s", b[:bytesRead])
 				}
@@ -85,13 +92,8 @@ func handleRRQ(res *tftp.RRQresponse) {
 		}()
 	}
 
-	if outReader == nil {
-		res.WriteError(tftp.NOT_FOUND, "No hook matches")
-		return
-	}
-
 	if res.Request.TransferSize != -1 {
-		res.TransferSize = length
+		res.TransferSize = hookResult.Length
 	}
 
 	if err := res.WriteOACK(); err != nil {
@@ -104,7 +106,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 	totalBytes := 0
 
 	for {
-		bytesRead, err := outReader.Read(b)
+		bytesRead, err := hookResult.Stdout.Read(b)
 		totalBytes += bytesRead
 
 		if err == io.EOF {
@@ -115,7 +117,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 			res.End()
 			break
 		} else if err != nil {
-			logger.Err("Error while reading %s: %s", outReader, err)
+			logger.Err("Error while reading %s: %s", hookResult.Stdout, err)
 			res.WriteError(tftp.UNKNOWN_ERROR, err.Error())
 			return
 		}
