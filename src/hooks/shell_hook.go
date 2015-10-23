@@ -76,11 +76,11 @@ var ShellHook = HookComponents{
 			}
 		}()
 
-		return &HookResult{
-			Stdout: ioutil.NopCloser(bytes.NewReader(outOutput)),
-			Stderr: ioutil.NopCloser(bytes.NewReader(errOutput)),
-			Length: -1,
-		}, err
+		return newHookResult(
+			ioutil.NopCloser(bytes.NewReader(outOutput)),
+			ioutil.NopCloser(bytes.NewReader(errOutput)),
+			-1,
+		), err
 
 	},
 	func(s string) string {

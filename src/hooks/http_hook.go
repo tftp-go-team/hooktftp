@@ -42,11 +42,7 @@ var HTTPHook = HookComponents{
 			return nil, fmt.Errorf("Bad response '%v' from %v", res.Status, url)
 		}
 
-		return &HookResult{
-			Stdout: res.Body,
-			Stderr: nil,
-			Length: int(res.ContentLength),
-		}, nil
+		return newHookResult(res.Body, nil, int(res.ContentLength)), nil
 
 	},
 	func(s string) string {

@@ -17,6 +17,14 @@ type HookResult struct {
 	Length int
 }
 
+func newHookResult(stdout, stderr io.ReadCloser, length int) *HookResult {
+	return &HookResult{
+		stdout,
+		stderr,
+		length,
+	}
+}
+
 type Hook func(path string, request tftp.Request) (*HookResult, error)
 
 type HookComponents struct {

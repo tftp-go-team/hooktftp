@@ -21,11 +21,7 @@ var FileHook = HookComponents{
 		if err != nil {
 			return nil, err
 		}
-		return &HookResult{
-			Stdout: file,
-			Stderr: nil,
-			Length: int(stat.Size()),
-		}, nil
+		return newHookResult(file, nil, int(stat.Size())), nil
 	},
 	func(s string) string {
 		return pathEscape.ReplaceAllLiteralString(s, "")
