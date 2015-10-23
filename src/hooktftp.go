@@ -34,11 +34,11 @@ func handleRRQ(res *tftp.RRQresponse) {
 		*res.Request.Addr,
 	))
 
-	var reader io.ReadCloser
+	var outReader io.ReadCloser
 	var len int
 	for _, hook := range HOOKS {
 		var err error
-		reader, len, err = hook(res.Request.Path, *res.Request)
+		outReader, _, len, err = hook(res.Request.Path, *res.Request)
 		if err == hooks.NO_MATCH {
 			continue
 		} else if err != nil {
@@ -53,7 +53,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 			return
 		}
 		defer func() {
-			err := reader.Close()
+			err := outReader.Close()
 			if err != nil {
 				logger.Err("Failed to close reader for %s: %s", res.Request.Path, err)
 			}
@@ -61,7 +61,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 		break
 	}
 
-	if reader == nil {
+	if outReader == nil {
 		res.WriteError(tftp.NOT_FOUND, "No hook matches")
 		return
 	}
@@ -80,7 +80,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 	totalBytes := 0
 
 	for {
-		bytesRead, err := reader.Read(b)
+		bytesRead, err := outReader.Read(b)
 		totalBytes += bytesRead
 
 		if err == io.EOF {
@@ -91,7 +91,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 			res.End()
 			break
 		} else if err != nil {
-			logger.Err("Error while reading %s: %s", reader, err)
+			logger.Err("Error while reading %s: %s", outReader, err)
 			res.WriteError(tftp.UNKNOWN_ERROR, err.Error())
 			return
 		}
