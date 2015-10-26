@@ -80,6 +80,7 @@ var ShellHook = HookComponents{
 			ioutil.NopCloser(bytes.NewReader(outOutput)),
 			ioutil.NopCloser(bytes.NewReader(errOutput)),
 			-1,
+			nil,
 		), err
 
 	},

@@ -54,12 +54,6 @@ func handleRRQ(res *tftp.RRQresponse) {
 			res.WriteError(tftp.UNKNOWN_ERROR, "Hook failed: "+err.Error())
 			return
 		}
-		defer func() {
-			err := hookResult.Stdout.Close()
-			if err != nil {
-				logger.Err("Failed to close reader for %s: %s", res.Request.Path, err)
-			}
-		}()
 		break
 	}
 
@@ -68,12 +62,17 @@ func handleRRQ(res *tftp.RRQresponse) {
 		return
 	}
 
+	// Consume stderr in a go routine, and defer the call to hook.Finalize.
 	if hookResult.Stderr != nil {
+
+		stderrReady := make(chan bool)
+
 		go func() {
 			defer func() {
 				if err := hookResult.Stderr.Close(); err != nil {
 					logger.Err("Failed to close error reader for %s: %s", res.Request.Path, err)
 				}
+				stderrReady <- true
 			}()
 
 			var bytesRead int
@@ -90,7 +89,26 @@ func handleRRQ(res *tftp.RRQresponse) {
 				}
 			}
 		}()
+
+		if hookResult.Finalize != nil {
+			defer func() {
+				<-stderrReady
+				err := hookResult.Finalize()
+				if err != nil {
+					logger.Err("Hook for %v failed to finalize: %v", res.Request.Path, err)
+				}
+			}()
+		}
+
 	}
+
+	// Close stdout before calling Finalize.
+	defer func() {
+		err := hookResult.Stdout.Close()
+		if err != nil {
+			logger.Err("Failed to close reader for %s: %s", res.Request.Path, err)
+		}
+	}()
 
 	if res.Request.TransferSize != -1 {
 		res.TransferSize = hookResult.Length

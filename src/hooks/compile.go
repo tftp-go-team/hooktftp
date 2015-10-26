@@ -11,17 +11,21 @@ import (
 
 var NO_MATCH = regexptransform.NO_MATCH
 
+type HookFinalizer func() error
+
 type HookResult struct {
-	Stdout io.ReadCloser
-	Stderr io.ReadCloser
-	Length int
+	Stdout   io.ReadCloser
+	Stderr   io.ReadCloser
+	Length   int
+	Finalize HookFinalizer
 }
 
-func newHookResult(stdout, stderr io.ReadCloser, length int) *HookResult {
+func newHookResult(stdout, stderr io.ReadCloser, length int, finalizer HookFinalizer) *HookResult {
 	return &HookResult{
 		stdout,
 		stderr,
 		length,
+		finalizer,
 	}
 }
 
