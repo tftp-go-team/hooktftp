@@ -3,11 +3,13 @@ package hooks
 import (
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/tftp-go-team/hooktftp/src/config"
+	"github.com/tftp-go-team/libgotftp/src"
 )
 
 type hookTestCase struct {
@@ -37,6 +39,11 @@ func TestHooks(t *testing.T) {
 
 	}))
 	defer ts.Close()
+
+	clientAddr := net.Addr(&net.TCPAddr{
+		IP:   net.ParseIP("198.51.100.13"),
+		Port: 63233,
+	})
 
 	var hookTestCases = []hookTestCase{
 		{
@@ -131,6 +138,31 @@ func TestHooks(t *testing.T) {
 		},
 		{
 			&config.HookDef{
+				Type:     "shell",
+				Regexp:   ".*",
+				Template: "sh -c 'echo $CLIENT_ADDR'",
+			},
+			"anything",
+			clientAddr.String(),
+			noError,
+		},
+		{
+			&config.HookDef{
+				Type:     "shell",
+				Regexp:   ".*",
+				Template: "",
+			},
+			"anything",
+			"anything",
+			func(err error) error {
+				if err == nil {
+					return fmt.Errorf("Bad url response test failed: Expected to have an error")
+				}
+				return nil
+			},
+		},
+		{
+			&config.HookDef{
 				Type:     "http",
 				Regexp:   "url\\/(.+)$",
 				Template: ts.URL + "/test/$1",
@@ -163,7 +195,9 @@ func TestHooks(t *testing.T) {
 			return
 		}
 
-		file, _, err := hook(testCase.input)
+		fakeRequest := tftp.Request{Addr: &clientAddr}
+
+		hookResult, err := hook(testCase.input, fakeRequest)
 		if err == NO_MATCH {
 			t.Error(testCase.hookDef.Regexp, "does not match with", testCase.input)
 		}
@@ -173,13 +207,13 @@ func TestHooks(t *testing.T) {
 			return
 		}
 
-		if file == nil {
+		if hookResult == nil {
 			return
 		}
 
-		data, err := ioutil.ReadAll(file)
+		data, err := ioutil.ReadAll(hookResult.Stdout)
 		if err != nil {
-			t.Error("Failed to read file", testCase.hookDef, file)
+			t.Error("Failed to read file", testCase.hookDef, hookResult.Stdout)
 			return
 		}
 

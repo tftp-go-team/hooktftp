@@ -6,12 +6,33 @@ import (
 
 	"github.com/tftp-go-team/hooktftp/src/logger"
 	"github.com/tftp-go-team/hooktftp/src/regexptransform"
+	"github.com/tftp-go-team/libgotftp/src"
 )
 
 var NO_MATCH = regexptransform.NO_MATCH
 
+type HookFinalizer func() error
+
+type HookResult struct {
+	Stdout   io.ReadCloser
+	Stderr   io.ReadCloser
+	Length   int
+	Finalize HookFinalizer
+}
+
+func newHookResult(stdout, stderr io.ReadCloser, length int, finalizer HookFinalizer) *HookResult {
+	return &HookResult{
+		stdout,
+		stderr,
+		length,
+		finalizer,
+	}
+}
+
+type Hook func(path string, request tftp.Request) (*HookResult, error)
+
 type HookComponents struct {
-	Execute func(string) (io.ReadCloser, int, error)
+	Execute Hook
 	escape  regexptransform.Escape
 }
 
@@ -21,8 +42,6 @@ type iHookDef interface {
 	GetRegexp() string
 	GetTemplate() string
 }
-
-type Hook func(string) (io.ReadCloser, int, error)
 
 var hookMap = map[string]HookComponents{
 	"file":  FileHook,
@@ -51,17 +70,13 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 		return nil, err
 	}
 
-	return func(path string) (io.ReadCloser, int, error) {
+	return func(path string, request tftp.Request) (*HookResult, error) {
 		newPath, err := transform(path)
 		if err != nil {
-			return nil, -1, err
+			return nil, err
 		}
 
 		logger.Info("Executing hook: %s %s -> %s", hookDef, path, newPath)
-		reader, len, err := components.Execute(newPath)
-		if err != nil {
-			return nil, len, err
-		}
-		return reader, len, nil
+		return components.Execute(newPath, request)
 	}, nil
 }
