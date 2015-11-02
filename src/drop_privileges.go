@@ -3,7 +3,8 @@ package main
 import (
 	"os/user"
 	"strconv"
-	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 func DropPrivileges(username string) error {
@@ -23,21 +24,20 @@ func DropPrivileges(username string) error {
 	}
 
 	// TODO: should set secondary groups too
-	err = syscall.Setgroups([]int{gid})
+	err = unix.Setgroups([]int{gid})
 	if err != nil {
 		return err
 	}
 
-	err = syscall.Setgid(gid)
+	err = unix.Setregid(gid, gid)
 	if err != nil {
 		return err
 	}
 
-	err = syscall.Setuid(uid)
+	err = unix.Setreuid(uid, uid)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
