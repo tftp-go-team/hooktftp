@@ -34,6 +34,8 @@ func handleRRQ(res *tftp.RRQresponse) {
 		*res.Request.Addr,
 	))
 
+	defer res.End()
+
 	var hookResult *hooks.HookResult
 
 	for _, hook := range HOOKS {
@@ -132,7 +134,6 @@ func handleRRQ(res *tftp.RRQresponse) {
 				logger.Err("Failed to write last bytes of the reader: %s", err)
 				return
 			}
-			res.End()
 			break
 		} else if err != nil {
 			logger.Err("Error while reading %s: %s", hookResult.Stdout, err)
