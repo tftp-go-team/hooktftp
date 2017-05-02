@@ -79,7 +79,7 @@ hooks:
 
 ### Compiling from sources
 
-[Install Go][] (1.1 or later), make sure you have git and bazaar too. 
+[Install Go][] (1.1 or later), make sure you have git and bazaar too.
 Assuming you've successfully set up GOPATH and have GOPATH/bin on your path, simply:
     
     make build
@@ -88,6 +88,13 @@ Now you should have a standalone hooktftp binary on your path.
 
     hooktftp -h
     Usage: hooktftp [-v] [config]
+
+### Docker
+
+Try hooktftp by using the [official Docker image](https://hub.docker.com/r/tftpgoteam/hooktftp/):
+
+    $> docker pull tftpgoteam/hooktftp
+    $> docker run --rm -ti -v /tmp/myfiles:/var/lib/tftpboot tftpgoteam/hooktftp
 
 ### Build Debian package
 
