@@ -9,12 +9,12 @@ func dummyEscape(s string) string {
 }
 
 type TransformTest struct {
-	regexp string
+	regexp   string
 	template string
-	escape Escape
-	input string
-	output string
-	err error
+	escape   Escape
+	input    string
+	output   string
+	err      error
 }
 
 var TransformTests = []TransformTest{
@@ -110,5 +110,3 @@ func TestTranforms(t *testing.T) {
 
 	}
 }
-
-

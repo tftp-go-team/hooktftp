@@ -2,13 +2,13 @@ package logger
 
 import (
 	"fmt"
-	"os"
 	"log/syslog"
+	"os"
 )
 
 var (
 	instance *syslog.Writer
-	err error
+	err      error
 )
 
 func Initialize(tag string) error {
@@ -91,4 +91,3 @@ func Warning(format string, a ...interface{}) (err error) {
 	}
 	return instance.Warning(str)
 }
-

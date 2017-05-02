@@ -8,8 +8,10 @@ import (
 
 var NO_MATCH = errors.New("No match")
 var BAD_GROUPS = errors.New("Regexp has too few groups")
+
 type Escape func(string) string
 type Transform func(string) (string, error)
+
 var fieldPat = regexp.MustCompile("\\$([0-9]+)")
 
 func NewRegexpTransform(regexpStr, template string, escape Escape) (Transform, error) {
@@ -27,7 +29,7 @@ func NewRegexpTransform(regexpStr, template string, escape Escape) (Transform, e
 
 		var err error
 
-		output := fieldPat.ReplaceAllStringFunc(template, func (f string) string {
+		output := fieldPat.ReplaceAllStringFunc(template, func(f string) string {
 			i, _ := strconv.Atoi(fieldPat.FindAllStringSubmatch(f, -1)[0][1])
 			if len(fields)-1 < i {
 				err = BAD_GROUPS
@@ -40,7 +42,7 @@ func NewRegexpTransform(regexpStr, template string, escape Escape) (Transform, e
 			return "", err
 		}
 
-		return output,  err
+		return output, err
 
 	}, nil
 }
