@@ -207,20 +207,18 @@ func TestHooks(t *testing.T) {
 			return
 		}
 
-		if hookResult == nil {
-			return
-		}
+		if hookResult != nil {
+			data, err := ioutil.ReadAll(hookResult.Stdout)
+			if err != nil {
+				t.Error("Failed to read file", testCase.hookDef, hookResult.Stdout)
+				return
+			}
 
-		data, err := ioutil.ReadAll(hookResult.Stdout)
-		if err != nil {
-			t.Error("Failed to read file", testCase.hookDef, hookResult.Stdout)
-			return
-		}
+			res := string(data[:len(testCase.expected)])
 
-		res := string(data[:len(testCase.expected)])
-
-		if res != testCase.expected {
-			t.Errorf("Expected to find '%v' from file but got '%v'", testCase.expected, res)
+			if res != testCase.expected {
+				t.Errorf("Expected to find '%v' from file but got '%v'", testCase.expected, res)
+			}
 		}
 	}
 }
