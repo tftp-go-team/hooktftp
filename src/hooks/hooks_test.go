@@ -186,6 +186,47 @@ func TestHooks(t *testing.T) {
 				return nil
 			},
 		},
+		// Test whitelist: url OK
+		{
+			&config.HookDef{
+				Type:      "http",
+				Regexp:    "url\\/(.+)$",
+				Template:  ts.URL + "/test/$1",
+				Whitelist: []string{"^" + ts.URL + ".*"},
+			},
+			"url/web.txt",
+			"RES:web.txt",
+			noError,
+		},
+		// Test whitelist: empty whitelist is similar to whitelist
+		{
+			&config.HookDef{
+				Type:      "http",
+				Regexp:    "url\\/(.+)$",
+				Template:  ts.URL + "/test/$1",
+				Whitelist: []string{},
+			},
+			"url/web.txt",
+			"RES:web.txt",
+			noError,
+		},
+		// Test whitelist: url not in whitelist
+		{
+			&config.HookDef{
+				Type:      "http",
+				Regexp:    "url\\/(.+)$",
+				Template:  ts.URL + "/bad",
+				Whitelist: []string{"^http://www.google.com", "^http://www.github.com/"},
+			},
+			"url/bad.txt",
+			"bad response",
+			func(err error) error {
+				if err == nil {
+					return fmt.Errorf("Bad url response test failed: Expected to have an error")
+				}
+				return nil
+			},
+		},
 	}
 
 	for _, testCase := range hookTestCases {

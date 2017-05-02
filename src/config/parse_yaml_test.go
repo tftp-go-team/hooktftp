@@ -28,6 +28,28 @@ hooks:
 	},
 }
 
+var shellHookWithWhitelistTest = yamlExample{
+	`
+hooks:
+  - type: shell
+    regexp: ^(.*)$
+    template: echo hello
+    whitelist:
+      - allowed
+      - allowed_too
+`,
+	Config{
+		HookDefs: []HookDef{
+			{
+				Type:      "shell",
+				Regexp:    "^(.*)$",
+				Template:  "echo hello",
+				Whitelist: []string{"allowed", "allowed_too"},
+			},
+		},
+	},
+}
+
 var httpHookTest = yamlExample{
 	`
 hooks:
@@ -89,6 +111,7 @@ user: hook
 		},
 	},
 	shellHookTest,
+	shellHookWithWhitelistTest,
 	httpHookTest,
 }
 

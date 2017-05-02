@@ -1,8 +1,10 @@
 package hooks
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"regexp"
 
 	"github.com/tftp-go-team/hooktftp/src/logger"
 	"github.com/tftp-go-team/hooktftp/src/regexptransform"
@@ -41,6 +43,7 @@ type iHookDef interface {
 	GetDescription() string
 	GetRegexp() string
 	GetTemplate() string
+	GetWhitelist() []string
 }
 
 var hookMap = map[string]HookComponents{
@@ -74,6 +77,29 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 		newPath, err := transform(path)
 		if err != nil {
 			return nil, err
+		}
+
+		whitelistRules := hookDef.GetWhitelist()
+		whitelisted := true
+
+		if len(whitelistRules) > 0 {
+			whitelisted = false
+
+			for _, path := range whitelistRules {
+				pat, err := regexp.Compile(path)
+
+				if err != nil {
+					return nil, err
+				}
+
+				if pat.MatchString(newPath) {
+					whitelisted = true
+				}
+			}
+		}
+
+		if !whitelisted {
+			return nil, errors.New("Requested file not in whitelist")
 		}
 
 		logger.Info("Executing hook: %s %s -> %s", hookDef, path, newPath)
