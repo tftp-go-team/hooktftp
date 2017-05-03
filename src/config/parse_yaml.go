@@ -5,10 +5,11 @@ import (
 )
 
 type HookDef struct {
-	Description string "description"
-	Type        string "type"
-	Regexp      string "regexp"
-	Template    string "template"
+	Description string   "description"
+	Type        string   "type"
+	Regexp      string   "regexp"
+	Template    string   "template"
+	Whitelist   []string "whitelist"
 }
 
 type Config struct {
@@ -32,6 +33,10 @@ func (d *HookDef) GetDescription() string {
 
 func (d *HookDef) GetRegexp() string {
 	return d.Regexp
+}
+
+func (d *HookDef) GetWhitelist() []string {
+	return d.Whitelist
 }
 
 func ParseYaml(yaml []byte) (*Config, error) {
