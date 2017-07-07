@@ -23,7 +23,7 @@ var FileHook = HookComponents{
 		}
 		return newHookResult(file, nil, int(stat.Size()), nil), nil
 	},
-	func(s string) string {
-		return pathEscape.ReplaceAllLiteralString(s, "")
+	func(s string) (string, error) {
+		return pathEscape.ReplaceAllLiteralString(s, ""), nil
 	},
 }

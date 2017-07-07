@@ -9,7 +9,7 @@ import (
 var NO_MATCH = errors.New("No match")
 var BAD_GROUPS = errors.New("Regexp has too few groups")
 
-type Escape func(string) string
+type Escape func(string) (string, error)
 type Transform func(string) (string, error)
 
 var fieldPat = regexp.MustCompile("\\$([0-9]+)")
@@ -35,7 +35,13 @@ func NewRegexpTransform(regexpStr, template string, escape Escape) (Transform, e
 				err = BAD_GROUPS
 				return ""
 			}
-			return escape(fields[i])
+			res, escape_err := escape(fields[i])
+
+			if escape_err != nil {
+				err = escape_err
+			}
+
+			return res
 		})
 
 		if err != nil {
@@ -43,6 +49,5 @@ func NewRegexpTransform(regexpStr, template string, escape Escape) (Transform, e
 		}
 
 		return output, err
-
 	}, nil
 }

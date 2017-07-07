@@ -1,11 +1,18 @@
 package regexptransform
 
 import (
+	"errors"
 	"testing"
 )
 
-func dummyEscape(s string) string {
-	return s
+func dummyEscape(s string) (string, error) {
+	return s, nil
+}
+
+var INVALID_ESCAPE = errors.New("escape failed")
+
+func erroneousEscape(s string) (string, error) {
+	return "", INVALID_ESCAPE
 }
 
 type TransformTest struct {
@@ -25,6 +32,14 @@ var TransformTests = []TransformTest{
 		"/var/tftpboot/hello",
 		"/var/tftpboot/hello",
 		nil,
+	},
+	{
+		".*",
+		"$0",
+		erroneousEscape,
+		"/var/tftpboot/hello",
+		"",
+		INVALID_ESCAPE,
 	},
 	{
 		"/var/tftpboot/(.*)$",
@@ -53,8 +68,8 @@ var TransformTests = []TransformTest{
 	{
 		"/var/tftpboot/(.*)$",
 		"http://localhost/get/$1",
-		func(s string) string {
-			return "'" + s + "'"
+		func(s string) (string, error) {
+			return "'" + s + "'", nil
 		},
 		"/var/tftpboot/hello",
 		"http://localhost/get/'hello'",

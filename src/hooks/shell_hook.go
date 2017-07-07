@@ -48,9 +48,9 @@ var ShellHook = HookComponents{
 		// cmd.Wait is used as Finalize to log the exit status.
 		return newHookResult(stdout, stderr, -1, cmd.Wait), err
 	},
-	func(s string) string {
+	func(s string) (string, error) {
 		return shellEscape.ReplaceAllStringFunc(s, func(s string) string {
 			return "\\" + s
-		})
+		}), nil
 	},
 }

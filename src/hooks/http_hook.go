@@ -45,7 +45,7 @@ var HTTPHook = HookComponents{
 		return newHookResult(res.Body, nil, int(res.ContentLength), nil), nil
 
 	},
-	func(s string) string {
-		return s
+	func(s string) (string, error) {
+		return s, nil
 	},
 }
