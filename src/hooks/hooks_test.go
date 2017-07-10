@@ -29,9 +29,16 @@ func TestHooks(t *testing.T) {
 		if r.URL.String() == "/bad" {
 			w.WriteHeader(500)
 			fmt.Fprintln(w, "bad response")
+			return
 		}
 
 		if r.URL.String() == "/test/web.txt" {
+			w.WriteHeader(200)
+			fmt.Fprintln(w, "RES:web.txt")
+			return
+		}
+
+		if r.URL.String() == "/*/ok" {
 			w.WriteHeader(200)
 			fmt.Fprintln(w, "RES:web.txt")
 			return
@@ -168,6 +175,17 @@ func TestHooks(t *testing.T) {
 				Template: ts.URL + "/test/$1",
 			},
 			"url/web.txt",
+			"RES:web.txt",
+			noError,
+		},
+		{
+			&config.HookDef{
+				Type:      "http",
+				Regexp:    "(.+)$",
+				Template:  ts.URL + "/$1",
+				UrlDecode: true,
+			},
+			"%2A/ok",
 			"RES:web.txt",
 			noError,
 		},

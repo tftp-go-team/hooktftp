@@ -4,17 +4,19 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+
+	"github.com/tftp-go-team/hooktftp/src/config"
 )
 
 var NO_MATCH = errors.New("No match")
 var BAD_GROUPS = errors.New("Regexp has too few groups")
 
-type Escape func(string) (string, error)
+type Escape func(string, config.HookExtraArgs) (string, error)
 type Transform func(string) (string, error)
 
 var fieldPat = regexp.MustCompile("\\$([0-9]+)")
 
-func NewRegexpTransform(regexpStr, template string, escape Escape) (Transform, error) {
+func NewRegexpTransform(regexpStr, template string, escape Escape, extraArgs config.HookExtraArgs) (Transform, error) {
 	pat, err := regexp.Compile(regexpStr)
 	if err != nil {
 		return nil, err
@@ -35,7 +37,7 @@ func NewRegexpTransform(regexpStr, template string, escape Escape) (Transform, e
 				err = BAD_GROUPS
 				return ""
 			}
-			res, escape_err := escape(fields[i])
+			res, escape_err := escape(fields[i], extraArgs)
 
 			if escape_err != nil {
 				err = escape_err

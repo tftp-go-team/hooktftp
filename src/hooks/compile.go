@@ -6,6 +6,7 @@ import (
 	"io"
 	"regexp"
 
+	"github.com/tftp-go-team/hooktftp/src/config"
 	"github.com/tftp-go-team/hooktftp/src/logger"
 	"github.com/tftp-go-team/hooktftp/src/regexptransform"
 	"github.com/tftp-go-team/libgotftp/src"
@@ -44,6 +45,7 @@ type iHookDef interface {
 	GetRegexp() string
 	GetTemplate() string
 	GetWhitelist() []string
+	GetExtraArgs() config.HookExtraArgs
 }
 
 var hookMap = map[string]HookComponents{
@@ -68,6 +70,7 @@ func CompileHook(hookDef iHookDef) (Hook, error) {
 		hookDef.GetRegexp(),
 		hookDef.GetTemplate(),
 		components.escape,
+		hookDef.GetExtraArgs(),
 	)
 	if err != nil {
 		return nil, err

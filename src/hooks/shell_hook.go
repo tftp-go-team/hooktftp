@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/google/shlex"
+	"github.com/tftp-go-team/hooktftp/src/config"
 	"github.com/tftp-go-team/libgotftp/src"
 )
 
@@ -48,7 +49,7 @@ var ShellHook = HookComponents{
 		// cmd.Wait is used as Finalize to log the exit status.
 		return newHookResult(stdout, stderr, -1, cmd.Wait), err
 	},
-	func(s string) (string, error) {
+	func(s string, _ config.HookExtraArgs) (string, error) {
 		return shellEscape.ReplaceAllStringFunc(s, func(s string) string {
 			return "\\" + s
 		}), nil

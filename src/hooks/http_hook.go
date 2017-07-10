@@ -3,7 +3,9 @@ package hooks
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
+	"github.com/tftp-go-team/hooktftp/src/config"
 	"github.com/tftp-go-team/libgotftp/src"
 )
 
@@ -45,7 +47,17 @@ var HTTPHook = HookComponents{
 		return newHookResult(res.Body, nil, int(res.ContentLength), nil), nil
 
 	},
-	func(s string) (string, error) {
-		return s, nil
+	func(s string, extra config.HookExtraArgs) (string, error) {
+		shouldUrlDecode := extra["urldecode"].(bool)
+
+		if !shouldUrlDecode {
+			return s, nil
+		}
+
+		unescaped, err := url.PathUnescape(s)
+		if err != nil {
+			return "", err
+		}
+		return unescaped, nil
 	},
 }

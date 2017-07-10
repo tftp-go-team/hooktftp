@@ -4,6 +4,7 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/tftp-go-team/hooktftp/src/config"
 	"github.com/tftp-go-team/libgotftp/src"
 )
 
@@ -23,7 +24,7 @@ var FileHook = HookComponents{
 		}
 		return newHookResult(file, nil, int(stat.Size()), nil), nil
 	},
-	func(s string) (string, error) {
+	func(s string, _ config.HookExtraArgs) (string, error) {
 		return pathEscape.ReplaceAllLiteralString(s, ""), nil
 	},
 }

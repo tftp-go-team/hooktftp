@@ -3,15 +3,17 @@ package regexptransform
 import (
 	"errors"
 	"testing"
+
+	"github.com/tftp-go-team/hooktftp/src/config"
 )
 
-func dummyEscape(s string) (string, error) {
+func dummyEscape(s string, extraArgs config.HookExtraArgs) (string, error) {
 	return s, nil
 }
 
 var INVALID_ESCAPE = errors.New("escape failed")
 
-func erroneousEscape(s string) (string, error) {
+func erroneousEscape(s string, extraArgs config.HookExtraArgs) (string, error) {
 	return "", INVALID_ESCAPE
 }
 
@@ -68,7 +70,7 @@ var TransformTests = []TransformTest{
 	{
 		"/var/tftpboot/(.*)$",
 		"http://localhost/get/$1",
-		func(s string) (string, error) {
+		func(s string, extraArgs config.HookExtraArgs) (string, error) {
 			return "'" + s + "'", nil
 		},
 		"/var/tftpboot/hello",
@@ -108,6 +110,7 @@ func TestTranforms(t *testing.T) {
 			tt.regexp,
 			tt.template,
 			tt.escape,
+			nil,
 		)
 		if err != nil {
 			t.Error("failed to compile transform:", err, tt)
