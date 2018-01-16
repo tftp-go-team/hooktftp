@@ -11,3 +11,7 @@ test: build
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C test clean
+
+.PHONY: gox
+gox:
+	$(MAKE) -C src gox
