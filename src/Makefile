@@ -31,3 +31,7 @@ clean:
 	go clean
 	-rm -rf launchpad.net
 	-rm -rf github.com
+
+.PHONY: gox
+gox:
+	gox -os="darwin linux" -arch="amd64" -osarch="\!darwin/arm64" -output "../bin/{{.OS}}_{{.Arch}}/hooktftp"

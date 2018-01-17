@@ -79,15 +79,34 @@ hooks:
 
 ### Compiling from sources
 
-[Install Go][] (1.1 or later), make sure you have git and bazaar too.
+[Install Go][] (1.8 or later), make sure you have git and bazaar too.
 Assuming you've successfully set up GOPATH and have GOPATH/bin on your path, simply:
-    
-    make build
-    
+
+```
+$ make build
+```
+
 Now you should have a standalone hooktftp binary on your path.
 
-    hooktftp -h
-    Usage: hooktftp [-v] [config]
+```
+$ hooktftp -h
+Usage: hooktftp [-v] [config]
+```
+
+You can use [gox](https://github.com/mitchellh/gox) to create *Darwin* and *Linux* executables:
+
+```
+$ brew install gox
+$ make gox
+$ tree
+bin
+├── darwin_amd64
+│   └── hooktftp
+└── linux_amd64
+    └── hooktftp
+
+2 directories, 2 files
+```
 
 ### Docker
 
