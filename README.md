@@ -79,7 +79,7 @@ hooks:
 
 ### Compiling from sources
 
-[Install Go][] (1.1 or later), make sure you have git and bazaar too.
+[Install Go][] (1.8 or later), make sure you have git and bazaar too.
 Assuming you've successfully set up GOPATH and have GOPATH/bin on your path, simply:
 
 ```
