@@ -22,3 +22,5 @@ so.
 Push the image:
 
     $> docker push tftpgoteam/hooktftp:latest
+
+Alternatively, the command `make release` will build and push the image for you.
