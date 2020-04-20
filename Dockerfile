@@ -1,5 +1,9 @@
 FROM golang
 
+RUN apt-get update \
+	&& apt-get install -y bzr-git \
+	&& apt-get clean
+
 VOLUME /var/lib/tftpboot
 
 COPY . /go/src/github.com/tftp-go-team/hooktftp
