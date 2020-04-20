@@ -15,3 +15,7 @@ clean:
 .PHONY: gox
 gox:
 	$(MAKE) -C src gox
+
+shell:
+	docker build -t hooktftp-shell .
+	docker run --rm -ti -v $(pwd):/go/src/github.com/tftp-go-team/hooktftp -w /app --name hooktftp hooktftp-shell bash
