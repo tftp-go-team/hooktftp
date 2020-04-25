@@ -11,4 +11,4 @@ script:
   - make test
 
 go:
-  - 1.8
+  - 1.x
