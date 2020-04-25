@@ -1,7 +1,7 @@
 FROM golang
 
 RUN apt-get update \
-	&& apt-get install -y bzr-git \
+	&& apt-get install -y bzr-git atftp \
 	&& apt-get clean
 
 VOLUME /var/lib/tftpboot
