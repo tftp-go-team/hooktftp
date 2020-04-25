@@ -18,7 +18,7 @@ gox:
 
 shell:
 	docker build -t hooktftp-shell .
-	docker run --rm -ti -v $(pwd):/go/src/github.com/tftp-go-team/hooktftp -w /go/src/github.com/tftp-go-team/hooktftp --name hooktftp hooktftp-shell bash
+	docker run --rm -ti -v $(shell pwd):/go/src/github.com/tftp-go-team/hooktftp -w /go/src/github.com/tftp-go-team/hooktftp --name hooktftp hooktftp-shell bash
 
 release:
 	docker build -t tftpgoteam/hooktftp:latest .
