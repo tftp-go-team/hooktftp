@@ -1,20 +1,14 @@
 # hooktftp
 
-Hooktftp is a dynamic read-only TFTP server. It's dynamic in a sense it is
-executes hooks matched on read requests (RRQ) instead of reading files from
-the file system. Hooks are matched with regular expressions and on match
-hooktftp will execute a script, issue a HTTP GET request or just reads the file
-from the filesystem.
+Hooktftp is a dynamic read-only TFTP server. It's dynamic in a sense it is executes hooks matched on read requests (RRQ) instead of reading files from the file system. Hooks are matched with regular expressions and on match hooktftp will execute a script, issue a HTTP GET request or just reads the file from the filesystem.
 
-This is inspired by [puavo-tftp]. It's written in Go in the hope of being faster
-and more stable.
+This is inspired by [puavo-tftp]. It's written in Go in the hope of being faster and more stable.
 
 ## Usage
 
     hooktftp [-v] [config]
 
-Config will be read from `/etc/hooktftp.yml` by default. Verbose option `-v`
-print log to stderr insteadof syslog.
+Config will be read from `/etc/hooktftp.yml` by default. Verbose option `-v` print log to stderr insteadof syslog.
 
 ## Configuration
 
@@ -36,9 +30,7 @@ Hooks consists of following keys:
     - Hook is executed when this regexp matches the requested path
   - `template`: A template where the regexp is expanded
 
-Regexp can be expanded to the template using the `$0`, `$1`, `$2` etc.
-variables. `$0` is the full matched regexp and rest are the matched regexp
-groups.
+Regexp can be expanded to the template using the `$0`, `$1`, `$2` etc. variables. `$0` is the full matched regexp and rest are the matched regexp groups.
 
 ### Example
 
@@ -79,7 +71,7 @@ hooks:
 
 ### Compiling from sources
 
-[Install Go][] (1.8 or later), make sure you have git and bazaar too.
+Install Go, make sure you have git and bazaar too.
 Assuming you've successfully set up GOPATH and have GOPATH/bin on your path, simply:
 
 ```

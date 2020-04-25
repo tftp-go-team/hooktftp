@@ -1,2 +1,2 @@
-src/hooktftp     /usr/sbin/
-src/hooktftp.yml /etc/
+hooktftp     /usr/sbin/
+configs/hooktftp.yml /etc/

@@ -1,26 +1,24 @@
-**This guide is intended for hooktftp maintainers. If you are not a maintainer,
-you probably want to check out the [documentation](README.md) instead.**
+**This guide is intended for hooktftp maintainers. If you are not a maintainer, you probably want to check out the [documentation](README.md) instead.**
 
 ## Package release HOWTO
 
-You made some updates on hooktftp and want to release a new version for your
-users? Make sure to complete this todo list.
+You made some updates on hooktftp and want to release a new version for your users? Make sure to complete this todo list.
 
+
+### Make sure debian package is still working
+
+A debian/ directory is provided to create a .deb package. To make sure it is still working, run the following commands:
+
+    $> make shell
+    #> apt-get install -y build-essential debhelper golang-go
+    #> dpkg-buildpackage -us -uc
+    #> cd ..
+    #> dpkg -i hooktftp_.deb
 
 ### Docker image
 
-Build the Docker image:
+Build and release the [Docker image](https://hub.docker.com/r/tftpgoteam/hooktftp/):
 
-    $> docker build -t tftpgoteam/hooktftp:latest .
+    $> make release-docker-image
 
-A docker image needs to be pushed on the [Docker
-hub](https://hub.docker.com/r/tftpgoteam/hooktftp/). Ping @brmzkw on Github or
-send him an email at castets.j - at - gmail.com to ask him to make the release.
-If you want to do it by yourself, ask him to grant you the permissions to do
-so.
-
-Push the image:
-
-    $> docker push tftpgoteam/hooktftp:latest
-
-Alternatively, the command `make release` will build and push the image for you.
+Ping @brmzkw on Github or send him an email at castets.j - at - gmail.com to ask him to make the release. If you want to do it by yourself, ask him to grant you the permissions to do so.

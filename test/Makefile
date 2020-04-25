@@ -8,7 +8,7 @@ all: check_shell check_files check_web exit
 
 .PHONY: hooktftp
 hooktftp:
-	../src/hooktftp -v config.yml & echo "$$!" > hooktftp.pid 
+	../hooktftp -v config.yml & echo "$$!" > hooktftp.pid 
 	@echo "Waiting for hooktftp server initialization ..."
 	sleep 3
 
@@ -105,7 +105,7 @@ web/limit: web fixtures/limit hooktftp httpd
 
 
 clean: 
-	-rm -r fixtures
-	-rm -r files
-	-rm -r shell
-	-rm -r web
+	$(RM) -rf fixtures
+	$(RM) -rf files
+	$(RM) -rf shell
+	$(RM) -rf web
