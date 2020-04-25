@@ -1,25 +1,28 @@
 .PHONY: build
 build:
-	$(MAKE) -C src
+	go build ./cmd/hooktftp
+
+.PHONY: build-docker-image
+build-docker-image:
+	docker build -t tftpgoteam/hooktftp:latest .
+
+.PHONY: release-docker-image
+release-docker-image: build-docker-image
+	docker push tftpgoteam/hooktftp:latest
+
+.PHONY: shell
+shell: build-docker-image
+	docker run --rm -ti -v $(shell pwd):/go/src/github.com/tftp-go-team/hooktftp/ -w /go/src/github.com/tftp-go-team/hooktftp --name hooktftp hooktftp-shell bash
 
 .PHONY: test
 test: build
-	$(MAKE) -C src test
-	$(MAKE) -C test all
+	go test ./...
 
 .PHONY: clean
 clean:
-	$(MAKE) -C src clean
+	go clean
 	$(MAKE) -C test clean
 
 .PHONY: gox
 gox:
-	$(MAKE) -C src gox
-
-shell:
-	docker build -t hooktftp-shell .
-	docker run --rm -ti -v $(shell pwd):/go/src/github.com/tftp-go-team/hooktftp -w /go/src/github.com/tftp-go-team/hooktftp --name hooktftp hooktftp-shell bash
-
-release:
-	docker build -t tftpgoteam/hooktftp:latest .
-	docker push tftpgoteam/hooktftp:latest
+	$(MAKE) ./cmd/hooktftp

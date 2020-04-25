@@ -9,7 +9,7 @@ VOLUME /var/lib/tftpboot
 COPY . /go/src/github.com/tftp-go-team/hooktftp
 WORKDIR /go/src/github.com/tftp-go-team/hooktftp
 
-RUN make
+RUN make build
 
 RUN echo '\
 user: nobody\n\
@@ -19,4 +19,4 @@ hooks:\n\
       regexp: ^.*$\n\
       template: /var/lib/tftpboot/$0' > /etc/hooktftp.yml
 
-CMD ./src/hooktftp -v
+CMD ./hooktftp -v
