@@ -17,6 +17,7 @@ shell: build-docker-image
 .PHONY: test
 test: build
 	go test ./...
+	$(MAKE) -C test all
 
 .PHONY: clean
 clean:
