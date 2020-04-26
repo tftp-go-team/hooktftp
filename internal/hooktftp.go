@@ -228,7 +228,7 @@ func HookTFTP() {
 			return
 		}
 		currentUser, _ := user.Current()
-		logger.Notice("Dropped privileges to %s", currentUser)
+		logger.Notice("Dropped %v privileges", currentUser.Username)
 	}
 
 	if conf.User == "" && syscall.Getuid() == 0 {
