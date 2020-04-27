@@ -5,3 +5,5 @@ test/fixtures/
 test/shell/
 test/web/
 test/hooktftp.pid
+debian/.debhelper/
+debian/hooktftp/
