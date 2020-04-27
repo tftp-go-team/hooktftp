@@ -1,3 +1,13 @@
+hooktftp (1.1.0) testing; urgency=low
+
+  * Add tsize support.
+  * Shell hook: set CLIENT_IP environment variable.
+  * Hooks: add callback when transfer is done.
+  * Hooks: add whitelist feature.
+  * Rework packaging.
+
+ -- Julien Castets <castets.j@gmail.com>  Mon, 27 Apr 2020 10:42:12 +0200
+
 hooktftp (1.0.0) testing; urgency=low
 
   * Improvement: Sources tree refactoring
