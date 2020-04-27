@@ -7,7 +7,7 @@ You made some updates on hooktftp and want to release a new version for your use
 
 ### Make sure debian package is still working
 
-A debian/ directory is provided to create a .deb package. To make sure it is still working, run the following commands:
+The debian/ directory is used to create a .deb package. Update the changelog, and test the package is still working with the following commands:
 
     $> make shell
     #> apt-get install -y build-essential debhelper golang-go
@@ -21,4 +21,4 @@ Build and release the [Docker image](https://hub.docker.com/r/tftpgoteam/hooktft
 
     $> make release-docker-image
 
-Ping @brmzkw on Github or send him an email at castets.j - at - gmail.com to ask him to make the release. If you want to do it by yourself, ask him to grant you the permissions to do so.
+Ping @brmzkw on Github or send him an email at castets.j - at - gmail.com to ask him to make to release. If you want to do it by yourself, ask him to grant you the permissions to do so.
