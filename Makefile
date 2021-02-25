@@ -12,7 +12,7 @@ release-docker-image: build-docker-image
 
 .PHONY: shell
 shell: build-docker-image
-	docker run --rm -ti -v $(shell pwd):/go/src/github.com/tftp-go-team/hooktftp/ -w /go/src/github.com/tftp-go-team/hooktftp --name hooktftp hooktftp-shell bash
+	docker run --rm -ti -v $(shell pwd):/go/src/github.com/tftp-go-team/hooktftp/ -w /go/src/github.com/tftp-go-team/hooktftp --name hooktftp tftpgoteam/hooktftp:latest bash
 
 .PHONY: test
 test: build
