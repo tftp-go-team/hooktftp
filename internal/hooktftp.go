@@ -18,6 +18,13 @@ import (
 	tftp "github.com/tftp-go-team/libgotftp/src"
 )
 
+const (
+	CONFIG_ERROR = 1
+	HOOK_ERROR = 2
+	NET_ERROR = 3
+	SYS_ERROR = 4
+)
+
 var HOOKS []hooks.Hook
 var CONFIG_PATH string = "/etc/hooktftp.yml"
 
@@ -154,7 +161,7 @@ func handleRRQ(res *tftp.RRQresponse) {
 	logger.Info("Sent %v bytes in %v %f MB/s\n", totalBytes, took, speed)
 }
 
-func HookTFTP() {
+func HookTFTP() int {
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "\nUsage: %s [-v] [config]\n", os.Args[0])
@@ -179,13 +186,13 @@ func HookTFTP() {
 
 	if err != nil {
 		logger.Crit("Failed to read config: %s", err)
-		return
+		return CONFIG_ERROR
 	}
 
 	conf, err := config.ParseYaml(configData)
 	if err != nil {
 		logger.Crit("Failed to parse config: %s", err)
-		return
+		return CONFIG_ERROR
 	}
 
 	for _, hookDef := range conf.HookDefs {
@@ -198,7 +205,7 @@ func HookTFTP() {
 		hook, err := hooks.CompileHook(&newPointer)
 		if err != nil {
 			logger.Crit("Failed to compile hook %v: %v", hookDef, err)
-			return
+			return HOOK_ERROR
 		}
 		HOOKS = append(HOOKS, hook)
 	}
@@ -210,13 +217,13 @@ func HookTFTP() {
 	addr, err := net.ResolveUDPAddr("udp", conf.Host+":"+conf.Port)
 	if err != nil {
 		logger.Crit("Failed to resolve address: %s", err)
-		return
+		return NET_ERROR
 	}
 
 	server, err := tftp.NewTFTPServer(addr)
 	if err != nil {
 		logger.Crit("Failed to listen: %s", err)
-		return
+		return NET_ERROR
 	}
 
 	logger.Notice("Listening on %v:%v", conf.Host, conf.Port)
@@ -225,7 +232,7 @@ func HookTFTP() {
 		err := DropPrivileges(conf.User)
 		if err != nil {
 			logger.Crit("Failed to drop privileges to '%s' error: %v", conf.User, err)
-			return
+			return SYS_ERROR
 		}
 		currentUser, _ := user.Current()
 		logger.Notice("Dropped %v privileges", currentUser.Username)
@@ -246,5 +253,7 @@ func HookTFTP() {
 	}
 
 	logger.Close()
+
+	return 0
 
 }
