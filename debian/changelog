@@ -1,8 +1,8 @@
-hooktftp (1.1.1-beta) testing; urgency=low
+hooktftp (1.1.1) testing; urgency=low
 
-  * Insert changes here.
+  * Set non-zero exit codes on failure.
 
- -- Julien Castets <castets.j@gmail.com>  Mon, 27 Apr 2020 10:42:12 +0200
+ -- Julien Castets <castets.j@gmail.com>  Fri, 19 Mar 2021 09:51:22 +0000
 
 hooktftp (1.1.0) testing; urgency=low
 
