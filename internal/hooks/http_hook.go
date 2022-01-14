@@ -10,7 +10,7 @@ import (
 )
 
 var HTTPHook = HookComponents{
-	func(url string, _ tftp.Request) (*HookResult, error) {
+	func(url string, tftpReq tftp.Request) (*HookResult, error) {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				if len(via) == 0 {
@@ -33,6 +33,7 @@ var HTTPHook = HookComponents{
 		}
 
 		req.Header.Set("User-Agent", "hooktftp v0.9.1")
+		req.Header.Set("X-Forwarded-For", (*tftpReq.Addr).String())
 
 		res, err := client.Do(req)
 		if err != nil {
