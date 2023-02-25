@@ -4,7 +4,7 @@ github.com/google/shlex
 # github.com/tftp-go-team/libgotftp v0.0.0-20160115164016-99de0d58e1b9
 ## explicit
 github.com/tftp-go-team/libgotftp/src
-# golang.org/x/sys v0.0.0-20200420163511-1957bb5e6d1f
+# golang.org/x/sys v0.1.0
 ## explicit
 golang.org/x/sys/unix
 # launchpad.net/gocheck v0.0.0-20140225173054-000000000087
